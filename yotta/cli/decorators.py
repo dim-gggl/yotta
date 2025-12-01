@@ -1,4 +1,4 @@
-import click
+import rich_click as click
 from functools import wraps
 from yotta.core.context import Context
 

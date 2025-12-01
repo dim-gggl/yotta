@@ -1,6 +1,6 @@
 import sys
 import os
-import click
+import rich_click as click
 from yotta.core.management.commands.startproject import StartProjectCommand
 from yotta.core.management.commands.startapp import StartAppCommand
 
@@ -28,7 +28,7 @@ class yottaUtility:
         # Here the magic happens: we create a dynamic Click group
         
         # We need to ensure that settings is accessible before loading the loader
-        if "yotta_SETTINGS_MODULE" not in os.environ:
+        if "YOTTA_SETTINGS_MODULE" not in os.environ:
              # Fallback simple for development, but manage.py already does this
              pass
 

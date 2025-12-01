@@ -8,14 +8,15 @@ class StartAppCommand:
             return
 
         app_name = args[0]
+        project_name = os.path.basename(os.getcwd())
         # By convention, we place the apps in src/
-        base_dir = os.path.join(os.getcwd(), "src", app_name)
+        base_dir = os.path.join(os.getcwd(), project_name, app_name)
 
         if os.path.exists(base_dir):
-            print(f"Error: The directory 'src/{app_name}' already exists.")
+            print(f"Error: The directory '{project_name}/{app_name}' already exists.")
             return
 
-        print(f"Creating application '{app_name}' in src/...")
+        print(f"Creating application '{app_name}' in {project_name}/...")
         self.create_structure(base_dir, app_name)
         
         print(f"[SUCCESS] App '{app_name}' created.")
@@ -45,10 +46,23 @@ from yotta.cli.decorators import command
 from yotta.core.context import Context
 
 @command(name="{app_name}_test")
-def test_command(ctx: Context):
+def test_command(yotta: YottaContext):
     \"\"\"Test command for the application {app_name}.\"\"\"
-    ctx.ui.header("Application : {app_name}")
-    ctx.ui.success("The command works!")
+    yotta.ui.header("Application : {app_name}")
+    yotta.ui.success("The command works!"
+    yotta.ui.table(
+        columns=["ID", "Name", "Email"],
+        rows=[["1", "John Doe", "john.doe@example.com"]],
+        title="Users"
+    )
+    with yotta.ui.spinner("Processing..."):
+        time.sleep(1)
+    try:
+        yotta.ui.confirm("Do you want to continue?")
+    except Exception as e:
+        yotta.ui.error(f"Error: {e}")
+        yotta.ui.warning("Warning: The command failed.)
+
 """
 
     def get_ui_template(self):

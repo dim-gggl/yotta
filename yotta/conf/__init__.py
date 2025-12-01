@@ -8,10 +8,10 @@ class Settings:
 
     def _setup(self):
         """Load the settings module defined in the environment."""
-        settings_module = os.environ.get("yotta_SETTINGS_MODULE")
+        settings_module = os.environ.get("YOTTA_SETTINGS_MODULE")
         if not settings_module:
             raise ImportError(
-                "yotta_SETTINGS_MODULE is not defined. "
+                "YOTTA_SETTINGS_MODULE is not defined. "
                 "Please ensure you are passing through manage.py to load the settings."
             )
         

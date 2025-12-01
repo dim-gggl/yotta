@@ -14,10 +14,10 @@ dependencies = [
 authors = [
   { name = "Dimitri Gaggioli", email = "dimitri.gaggioli@gmail.com" },
 ]
-license = { file = "LICENSE" }
+license-files = ["LICENSE"]
 
 [project.urls]
-"Homepage" = "https://github.com/ton-repo/yotta"
+"Homepage" = "https://github.com/dim-gggl/yotta"
 
 # C'est ici qu'on définit la commande système 'yotta'
 [project.scripts]

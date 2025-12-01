@@ -1,5 +1,5 @@
 import importlib
-import click
+import rich_click as click
 from yotta.conf import settings
 
 class AppLoader:

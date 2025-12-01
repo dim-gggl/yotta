@@ -1,6 +1,6 @@
 import re
 import os
-import click
+import rich_click as click
 
 class yottaType(click.ParamType):
     """Base class for our custom types."""

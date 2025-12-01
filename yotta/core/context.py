@@ -1,12 +1,8 @@
-import click
-# We import our new class
-try:
-    from yotta.ui.console import yottaConsole
-except ImportError:
-    yottaConsole = None  # Fallback or warning could go here
+import rich_click as click
+from yotta.ui.console import yottaConsole
 
 
-class Context:
+class YottaContext:
     """
     The yotta context that travels from command to command.
     It contains the settings and the UI engine.

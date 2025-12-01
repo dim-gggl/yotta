@@ -1,0 +1,24 @@
+[project]
+name = "yotta"
+version = "0.1.0"
+description = "A modern CLI framework based on Click, Rich and Textual."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "click>=8.3.1",
+    "rich>=14.2.0",
+    "rich-click>=1.9.4",
+    "textual>=6.7.0",
+    "jinja2>=3.1.6",
+]
+authors = [
+  { name = "Dimitri Gaggioli", email = "dimitri.gaggioli@gmail.com" },
+]
+license = { file = "LICENSE" }
+
+[project.urls]
+"Homepage" = "https://github.com/ton-repo/yotta"
+
+# C'est ici qu'on définit la commande système 'yotta'
+[project.scripts]
+yotta = "yotta.__main__:main"

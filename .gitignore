@@ -1,0 +1,131 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+.python-version
+.DS_Store
+.vscode/
+.env
+.claude/
+.codex/
+.cursor/
+.AGENTS/
+.AGENTS.md
+
+# Virtual environments
+.venv
+
+
+### Operating System ###
+# macOS
+.DS_Store
+.localized
+.Spotlight-V100
+.Trashes
+._*
+.fseventsd
+
+### Python ###
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.pyc
+*.pyd
+*.pyo
+*.egg
+*.egg-info/
+
+# Virtual environments
+.venv/
+virtualenv/
+env/
+# Explicitly ignore common virtual environment paths outside of .venv, venv, env
+# This helps catch environments created with different names or paths
+*/bin/python
+*/include/python*
+*/lib/python*
+
+# Distribution / build artifacts
+dist/
+build/
+*.whl
+
+# Tests and coverage
+.pytest_cache/
+.coverage
+htmlcov/
+.nox/
+
+# MyPy cache
+.mypy_cache/
+
+# Jupyter Notebooks / IPython
+.ipynb_checkpoints/
+*.orig
+nb_html/
+
+# Logs and temporary files
+*.log
+logs/
+tmp/
+temp/
+
+### Package Managers ###
+# uv (uses .venv by default, already covered)
+
+### Editors and IDEs ###
+# Cursor IDE (built on VS Code)
+.cursor/
+.cursorrules/
+.vscode/
+
+# Common editor backup files
+*~
+*.swp
+.idea/ # For PyCharm if it ever gets used, good general ignore for JetBrains IDEs
+
+### AI Agents & Tools ###
+# Specific agent directories and files requested
+.AGENTS/
+AGENTS.md
+
+# General AI agent artifacts, caches, and temporary outputs
+agent_logs/
+agent_cache/
+openai_cache/
+claude_cache/
+tmp_ai_output/
+ai_generated/
+*.ai.py
+*.gen.py
+*.md.ai # Often AI agents generate additional markdown files
+
+### Sensitive Files and Credentials ###
+# Environment variables
+.env
+.env.*
+*.env
+
+# Credentials and private keys
+credentials.*
+*.key
+*.pem
+*.crt
+*.p12
+id_rsa
+id_dsa
+id_ecdsa
+id_ed25519
+known_hosts
+
+# Configuration files that may contain secrets
+config.ini
+settings.py # If it contains local/sensitive settings not meant for VCS
+local_settings.py
+secrets.py
+
+# Development databases
+*.sqlite3
+db.sqlite3

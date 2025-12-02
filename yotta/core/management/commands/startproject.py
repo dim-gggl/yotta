@@ -86,7 +86,7 @@ if __name__ == "__main__":
         return f"""
 # Configuration yotta
 INSTALLED_APPS=[
-    \"{project_name}.main\",
+    \"{project_name}\",
 ]
 
 THEME=\"default\"

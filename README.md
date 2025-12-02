@@ -1,4 +1,7 @@
 # yotta
+
+![](./media/yotta_dark.svg)
+
 Build beautiful CLIs and TUIs in Python, the Django way.
 
 yotta is a modern framework designed to simplify the creation of Command Line Interfaces (CLI) and Terminal User Interfaces (TUI).

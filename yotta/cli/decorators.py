@@ -1,6 +1,6 @@
 import rich_click as click
 from functools import wraps
-from yotta.core.context import Context
+from yotta.core.context import YottaContext
 
 def command(name=None, **kwargs):
     """
@@ -12,7 +12,7 @@ def command(name=None, **kwargs):
         @wraps(f)
         def wrapper(click_ctx, *args, **kwargs):
             # Magic transformation: Click Context -> yotta Context
-            yotta_ctx = Context(click_ctx)
+            yotta_ctx = YottaContext(click_ctx)
             return f(yotta_ctx, *args, **kwargs)
         return wrapper
     return decorator

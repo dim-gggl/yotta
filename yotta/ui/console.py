@@ -1,14 +1,18 @@
 from typing import List, Optional
-from rich.console import Console
-from rich.panel import Panel
-from rich.table import Table
-from rich.text import Text
-from rich.prompt import Confirm, Prompt
+from yotta.rich_ui import rich
 from yotta.ui.theme import DEFAULT_THEME
 
+
 class yottaConsole:
+    """
+    High-level console wrapper for yotta framework.
+
+    Provides convenient methods for common UI operations using Rich components
+    through the unified RichUI interface.
+    """
+
     def __init__(self):
-        self._console = Console(theme=DEFAULT_THEME)
+        self._console = rich.console(theme=DEFAULT_THEME)
 
     def write(self, text: str, style: str = None):
         """Affiche du texte simple."""
@@ -18,8 +22,8 @@ class yottaConsole:
 
     def header(self, title: str, subtitle: str = None):
         """Display a styled large header."""
-        content = Text(subtitle, style="secondary") if subtitle else None
-        self._console.print(Panel(
+        content = rich.text(subtitle, style="secondary") if subtitle else None
+        self._console.print(rich.panel(
             content or "",
             title=f"[header]{title.upper()}[/]",
             border_style="primary",
@@ -29,13 +33,20 @@ class yottaConsole:
         self._console.print()  # Spacer
 
     def success(self, msg: str):
-        self._console.print(f"[success]✔[/] {msg}")
+        """Display a success message."""
+        self._console.print(f"[bold bright_green]✔[/] {msg}")
 
     def error(self, msg: str):
-        self._console.print(f"[error]✖[/] {msg}")
+        """Display an error message."""
+        self._console.print(f"[bold bright_red]✖[/] {msg}")
 
     def warning(self, msg: str):
-        self._console.print(f"[warning]⚠[/] {msg}")
+        """Display a warning message."""
+        self._console.print(f"[bold bright_yellow]⚠[/] {msg}")
+
+    def info(self, msg: str):
+        """Display an info message."""
+        self._console.print(f"[bold bright_blue]ℹ[/] {msg}")
 
     # --- COMPLEX COMPONENTS ---
 
@@ -44,37 +55,39 @@ class yottaConsole:
         Create and display a formatted table automatically.
         Usage: ctx.ui.table(["Nom", "Âge"], [["Alice", "25"], ["Bob", "30"]])
         """
-        table = Table(title=title, header_style="header", border_style="primary")
-        
+        table = rich.table(title=title, header_style="bold bright_cyan", border_style="primary")
+
         for col in columns:
             table.add_column(col)
-            
+
         for row in rows:
             # Convert everything to string to avoid Rich errors
             table.add_row(*[str(r) for r in row])
-            
+
         self._console.print(table)
         self._console.print()
 
     def panel(self, content: str, title: str = None, style: str = "primary"):
         """Display an information panel."""
-        self._console.print(Panel(content, title=title, border_style=style))
+        self._console.print(rich.panel(content, title=title, border_style=style))
 
     # --- INTERACTIVITY ---
 
     def ask(self, question: str, default: str = None) -> str:
         """Wrapper around Rich Prompt."""
+        from rich.prompt import Prompt
         return Prompt.ask(f"[primary]{question}[/]", default=default, console=self._console)
 
     def confirm(self, question: str, default: bool = True) -> bool:
         """Wrapper around Rich Confirm."""
+        from rich.prompt import Confirm
         return Confirm.ask(f"[primary]{question}[/]", default=default, console=self._console)
 
     # --- LOADER / SPINNER ---
-    
+
     def spinner(self, message: str = "Loading..."):
         """
         Context manager to display a spinner during a long operation.
         Usage: with ctx.ui.spinner("Processing..."): ...
         """
-        return self._console.status(f"[bold]{message}[/]", spinner="dots")
+        return self._console.status(f"[bold]{message}[/]", spinner="dots12")

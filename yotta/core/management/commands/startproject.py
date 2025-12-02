@@ -44,16 +44,18 @@ class StartProjectCommand:
             self.create_structure(base_dir, project_name)
         console.print(f"[green]✔[/] Success! cd {project_name} && python manage.py\n\n")
 
-    def create_structure(self, base_dir, project_name):  # noqa: ARG002
+    def create_structure(self, base_dir, project_name):
         """Create the directory structure and boilerplate files for a new project."""
         # 1. Création des dossiers
         os.makedirs(os.path.join(base_dir, project_name, "main"))
-        
+
         # 2. Création de manage.py
         self.write_file(base_dir, "manage.py", self.get_manage_py_template())
-        
+
         # 3. Création des settings
-        self.write_file(base_dir, "settings.py", self.get_settings_template())
+        self.write_file(base_dir, "settings.py", self.get_settings_template(project_name))
+
+        self.write_file(base_dir, "__init__.py", "")
         
         # 4. Fichiers __init__.py pour faire des packages
         self.write_file(os.path.join(base_dir, project_name), "__init__.py", "")
@@ -76,29 +78,55 @@ import sys
 from yotta.core.management import execute_from_command_line
 
 if __name__ == "__main__":
-    os.environ.setdefault("YOTTA_SETTINGS_MODULE", "settings.py")
+    os.environ.setdefault("YOTTA_SETTINGS_MODULE", "settings")
     execute_from_command_line(sys.argv)
 """
 
-    def get_settings_template(self):
+    def get_settings_template(self, project_name):
         return f"""
 # Configuration yotta
-INSTALLED_APPS = [
-    'src.main',
+INSTALLED_APPS=[
+    \"{project_name}.main\",
 ]
 
-THEME = 'default'
+THEME=\"default\"
 
-ROOT_DIR = {os.getcwd()}
+ROOT_DIR=\"{os.getcwd()}\"
 """
 
     def get_commands_template(self):
         return """
 from yotta.cli.decorators import command
-from yotta.core.context import Context
+from yotta.core.context import YottaContext
+from yotta.rich_ui import rich, Panel
+
+console = rich.console()
 
 @command(name="hello")
-def hello_world(ctx: Context):
-    ctx.ui.header("Hello yotta")
-    ctx.ui.success("Your first app works!")
+def hello_world(yotta: YottaContext):
+    console.clear()
+    console.print(
+        Panel.fit(
+            "yotta",
+            title="Hello",
+            border_style="bold bright_green"
+        ),
+        style="bold",
+        justify="center"
+    )
+    console.print(
+        rich.panel(
+            rich.align(
+                rich.text(
+                    "It works!",
+                    style="bold"
+                ),
+                align="center"
+            ),
+            title="Your first app !",
+            border_style="bold orange_red1"
+        ),
+        style="bold"
+    )
+    console.print()
 """

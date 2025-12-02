@@ -9,8 +9,7 @@ class yottaSpinner:
         self.spinner = Spinner(spinner, message, style=DEFAULT_THEME.styles["primary"])
 
     def __enter__(self):
-        self.align.start()
-        return self
+        return self.centered().start()
 
     def __exit__(self, exc_type, exc_value, traceback):
         self.align.stop()

@@ -17,7 +17,7 @@ Developing complex CLIs often ends up in "spaghetti code." yotta brings structur
 
 For now (local development):
 ```bash
-git clone [https://github.com/dim-gggl/yotta.git](https://github.com/dim-gggl/yotta.git)
+git clone https://github.com/dim-gggl/yotta.git
 cd yotta
 pip install -e .
 ```
@@ -101,6 +101,45 @@ yotta injects a ui wrapper into all your commands. No need to instantiate Consol
 |`ctx.ui.table(cols, rows)`|Generates a formatted Rich table.|
 |`ctx.ui.spinner(msg)`|Context manager for an animated loader.|
 |`ctx.ui.confirm(question)`|Interactive Yes/No prompt.|
+
+### RichUI - Unified Access to All Rich Components
+
+Need direct access to Rich components? Use the `rich` singleton to instantiate any Rich component without manual imports.
+
+```python
+from yotta.ui import rich
+
+# Instead of: from rich.align import Align
+align = rich.align("Centered text", align="center")
+
+# Instead of: from rich.syntax import Syntax
+syntax = rich.syntax(code, "python", theme="monokai")
+
+# Instead of: from rich.table import Table
+table = rich.table(title="My Data")
+
+# Instead of: from rich.tree import Tree
+tree = rich.tree("Root")
+
+# Instead of: from rich.panel import Panel
+panel = rich.panel("Content", title="Info")
+```
+
+**Available components and utilities:**
+
+- **Core:** console, group
+- **Layout:** align, columns, constrain, layout, padding
+- **Containers:** panel
+- **Text & Styling:** color, emoji, pretty, style, styled, syntax, text, theme, markdown
+- **Tables & Trees:** table, tree
+- **Progress:** progress, spinner, status, live (with bar_column, text_column, etc.)
+- **Prompts:** prompt, confirm, int_prompt, float_prompt
+- **Rendering:** rule, segment, traceback, json
+- **Utilities:** pprint, pretty_repr, install_traceback, escape_markup, render_markup
+
+**Box styles:** Access via `rich.ROUNDED`, `rich.HEAVY`, `rich.DOUBLE`, `rich.MINIMAL`
+
+This singleton approach provides seamless access to all Rich functionality through a single import, keeping your code clean and consistent.
 
 ### Smart Types (yotta.cli.types)
 

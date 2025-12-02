@@ -8,7 +8,7 @@ dependencies = [
     "click>=8.3.1",
     "rich>=14.2.0",
     "rich-click>=1.9.4",
-    "textual>=6.7.0",
+    "textual>=6.7.1",
     "jinja2>=3.1.6",
 ]
 authors = [
@@ -22,3 +22,8 @@ license-files = ["LICENSE"]
 # C'est ici qu'on définit la commande système 'yotta'
 [project.scripts]
 yotta = "yotta.__main__:main"
+
+[tool.uv.workspace]
+members = [
+    "mon-projet",
+]

@@ -1,18 +1,38 @@
-# yotta
+# <div align="center">yotta
+
+<div align="center">
+    <a href="https://www.python.org/">
+      <img alt="Python Badge" src="https://img.shields.io/badge/python-3.10%2B-blue?style=plastic&logo=python&logoColor=yellow">
+    </a>
+    <a href="https://docs.astral.sh/uv/">
+      <img alt="uv Badge" src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json">
+    </a>
+    <a href="https://rich.readthedocs.io/en/stable/index.html">
+      <img alt="Static Badge" src="https://img.shields.io/badge/rich-14.1.0-%238b36db">
+    </a>
+    <a href="https://click.palletsprojects.com/en/stable/">
+      <img alt="Static Badge" src="https://img.shields.io/badge/click-8.3.1%2B-%23cea3c7?style=plastic&logo=click&logoColor=%23cea3c7">
+    </a>
+    <a href="https://pypi.org/project/rich-click/">
+      <img alt="Yes Yotta Badge" class="" src="https://img.shields.io/badge/rich--click-1.9.4%2B-%23800000?style=plastic&logo=rich-click&logoColor=%23800000">
+    </a>
+</div>
 
 ![](./media/yotta_dark.svg)
 
-Build beautiful CLIs and TUIs in Python, the Django way.
+Build complete CLIs and TUIs in Python, the fast way. (Django inspired)
 
-yotta is a modern framework designed to simplify the creation of Command Line Interfaces (CLI) and Terminal User Interfaces (TUI).
+yotta is designed to simplify the creation of Command Line Interfaces (CLI) and Terminal User Interfaces (TUI).
 
 It combines the robustness of Click, the beauty of Rich, and the interactivity of Textual within a modular architecture inspired by Django.
 
 ## Why yotta?
 
-Developing complex CLIs often ends up in "spaghetti code." yotta brings structure to the chaos:
+As lots of implementation in programming, building a CLI app is always following a universal pattern which yotta tries to simplify in order to program faster while maintaining security and efficience on the forescene.
+
+Building a CLI app with yotta is making sure to get:
 - Modular Architecture: Split your code into reusable "Apps" (startproject, startapp).
-- UI-First: A native UX engine. Display tables, spinners, and alerts without manually importing Rich.
+- UI-First Spirit: A native UX engine. Display tables, spinners, and alerts without manually importing Rich.
 - Hybrid TUI Mode: Transform a command into a full interactive dashboard (mouse/keyboard) via native Textual integration.
 - Smart Arguments: Automatic validation (Email, Files, Ranges) before your code even runs.
 

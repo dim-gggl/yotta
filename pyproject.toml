@@ -27,3 +27,6 @@ yotta = "yotta.__main__:main"
 members = [
     "mon-projet",
 ]
+
+[tool.setuptools]
+packages = ["yotta"]

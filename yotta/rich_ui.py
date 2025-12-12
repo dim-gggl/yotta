@@ -220,6 +220,10 @@ class RichUI:
     def panel(self, *args, **kwargs) -> Panel:
         """Create a Panel."""
         return self._panel(*args, **kwargs)
+    
+    def panel_fit(self, *args, **kwargs) -> Panel:
+        """Create a Panel with fit."""
+        return Panel.fit(*args, **kwargs)
 
     # Text and styling
     def color(self, *args, **kwargs) -> Color:

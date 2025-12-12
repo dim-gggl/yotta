@@ -4,9 +4,9 @@ from rich.theme import Theme
 DEFAULT_THEME = Theme({
     "primary": "orange_red1",
     "secondary": "bright_cyan",
-    "success": "bold bright_green",
-    "warning": "bold bright_yellow",
-    "error": "bold bright_red",
-    "info": "bold bright_blue",
+    "success": "bold dark_cyan",
+    "warning": "bold yellow3",
+    "error": "bold red3",
+    "info": "bold blue_violet",
     "header": "bold orange_red1",
 })

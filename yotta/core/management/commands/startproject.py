@@ -72,7 +72,7 @@ class StartProjectCommand:
     # --- TEMPLATES (Hardcodés pour le MVP) ---
     
     def get_manage_py_template(self):
-        return """#!/usr/bin/env python
+        return """#!/usr/bin/env python3
 import os
 import sys
 from yotta.core.management import execute_from_command_line

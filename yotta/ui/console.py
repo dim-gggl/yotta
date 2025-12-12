@@ -53,7 +53,7 @@ class yottaConsole:
     def table(self, columns: List[str], rows: List[List[str]], title: str = None):
         """
         Create and display a formatted table automatically.
-        Usage: ctx.ui.table(["Nom", "Âge"], [["Alice", "25"], ["Bob", "30"]])
+        Usage: yotta.ui.table(["Nom", "Âge"], [["Alice", "25"], ["Bob", "30"]])
         """
         table = rich.table(title=title, header_style="bold bright_cyan", border_style="primary")
 
@@ -88,6 +88,6 @@ class yottaConsole:
     def spinner(self, message: str = "Loading..."):
         """
         Context manager to display a spinner during a long operation.
-        Usage: with ctx.ui.spinner("Processing..."): ...
+        Usage: with yotta.ui.spinner("Processing..."): ...
         """
         return self._console.status(f"[bold]{message}[/]", spinner="dots12")

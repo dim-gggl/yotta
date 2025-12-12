@@ -8,7 +8,7 @@
       <img alt="uv Badge" src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json">
     </a>
     <a href="https://rich.readthedocs.io/en/stable/index.html">
-      <img alt="Static Badge" src="https://img.shields.io/badge/rich-14.1.0-%238b36db">
+      <img alt="Static Badge" src="https://img.shields.io/badge/rich-14.1.0%2B-%238b36db">
     </a>
     <a href="https://click.palletsprojects.com/en/stable/">
       <img alt="Static Badge" src="https://img.shields.io/badge/click-8.3.1%2B-%23cea3c7?style=plastic&logo=click&logoColor=%23cea3c7">
@@ -42,7 +42,8 @@ For now (local development):
 ```bash
 git clone https://github.com/dim-gggl/yotta.git
 cd yotta
-pip install -e .
+uv sync
+uv pip install -e .
 ```
 ## Quick Start
 
@@ -55,7 +56,7 @@ cd my_cli
 ```
 2. Create an app (module)
 ```bash
-python manage.py startapp inventory
+uv run manage.py startapp inventory
 ```
 > Note: Don't forget to add 'src.inventory' to INSTALLED_APPS in your yotta_settings.py file.
 3. Write your first command
@@ -67,18 +68,18 @@ from yotta.cli.types import EMAIL
 
 @command(name="add_user", help="Adds a user to the inventory")
 @argument("email", type=EMAIL)
-def add_user(ctx: Context, email: str):
+def add_user(yotta: Context, email: str):
     # Using the native UI engine
-    ctx.ui.header("New User")
+    yotta.ui.header("New User")
     
-    with ctx.ui.spinner("Checking database..."):
+    with yotta.ui.spinner("Checking database..."):
         # Simulate work
         import time; time.sleep(1)
         
-    ctx.ui.success(f"User [bold]{email}[/] added successfully!")
+    yotta.ui.success(f"User [bold]{email}[/] added successfully!")
     
     # Automatic formatted table
-    ctx.ui.table(
+    yotta.ui.table(
         columns=["ID", "Email", "Status"],
         rows=[["1", email, "Active"]],
         title="Summary"
@@ -112,18 +113,18 @@ def launch_monitor(ctx: Context):
 
 ```
 ## Key Features
-### The UI Context (ctx.ui)
+### The UI Context (yotta.ui)
 
 yotta injects a ui wrapper into all your commands. No need to instantiate Console everywhere.
 
 |Method|Description|
 |:--|:--|
-|`ctx.ui.header(title, subtitle)`|Displays a stylized panel header.|
-|`ctx.ui.success(msg)`|Displays a success message (green).|
-|`ctx.ui.error(msg)`|Displays an error message (red).|
-|`ctx.ui.table(cols, rows)`|Generates a formatted Rich table.|
-|`ctx.ui.spinner(msg)`|Context manager for an animated loader.|
-|`ctx.ui.confirm(question)`|Interactive Yes/No prompt.|
+|`yotta.ui.header(title, subtitle)`|Displays a stylized panel header.|
+|`yotta.ui.success(msg)`|Displays a success message (green).|
+|`yotta.ui.error(msg)`|Displays an error message (red).|
+|`yotta.ui.table(cols, rows)`|Generates a formatted Rich table.|
+|`yotta.ui.spinner(msg)`|Context manager for an animated loader.|
+|`yotta.ui.confirm(question)`|Interactive Yes/No prompt.|
 
 ### RichUI - Unified Access to All Rich Components
 

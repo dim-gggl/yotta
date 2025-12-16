@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Callable, Any
 from yotta.rich_ui import rich
 from yotta.ui.theme import DEFAULT_THEME
 
@@ -83,6 +83,18 @@ class yottaConsole:
         from rich.prompt import Confirm
         return Confirm.ask(f"[primary]{question}[/]", default=default, console=self._console)
 
+    def prompt(self, question: str, type_: Callable = str, default: Any = None):
+        """
+        Prompt for input and optionally validate via a callable/type.
+        """
+        from rich.prompt import Prompt
+        while True:
+            value = Prompt.ask(f"[primary]{question}[/]", default=default, console=self._console)
+            try:
+                return type_(value) if callable(type_) else value
+            except Exception as e:
+                self.error(f"Invalid value: {e}")
+
     # --- LOADER / SPINNER ---
 
     def spinner(self, message: str = "Loading..."):
@@ -91,3 +103,25 @@ class yottaConsole:
         Usage: with yotta.ui.spinner("Processing..."): ...
         """
         return self._console.status(f"[bold]{message}[/]", spinner="dots12")
+
+    def progress(self, description: str = "Working..."):
+        """
+        Create a Rich progress bar and return a task ID for manual updates.
+        Usage:
+            progress, task = yotta.ui.progress("Downloading")
+            for i in range(...):
+                progress.update(task, advance=1)
+        """
+        progress = rich.progress(
+            transient=True,
+            expand=True,
+        )
+        task = progress.add_task(description, total=100)
+        return progress, task
+
+    def task(self, title: str, work: Callable[[], Any]):
+        """
+        Simple task runner helper: shows a spinner while executing the callable.
+        """
+        with self.spinner(title):
+            return work()

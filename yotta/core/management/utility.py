@@ -1,58 +1,75 @@
 import sys
 import os
 import rich_click as click
-from yotta.core.management.commands.startproject import StartProjectCommand
-from yotta.core.management.commands.startapp import StartAppCommand
+from rich.console import Console
+from yotta.core.management.commands.startproject import startproject_command
+from yotta.core.management.commands.startapp import startapp_command
+from yotta.core.management.commands.startcommand import startcommand_command
 
 
 class yottaUtility:
     def __init__(self, argv=None):
         self.argv = argv or sys.argv[:]
+        self.console = Console()
 
     def execute(self):
-        try:
-            subcommand = self.argv[1]
-        except IndexError:
-            subcommand = None
+        subcommand = None
+        for arg in self.argv[1:]:
+            if arg.startswith("-"):
+                continue
+            subcommand = arg
+            break
 
-        # 1. Management of system commands (Bootstrap)
-        if subcommand == 'startproject':
-            StartProjectCommand().run(self.argv[2:])
-            return
+        base_commands = {
+            "startproject": startproject_command,
+            "startapp": startapp_command,
+            "startcommand": startcommand_command,
+        }
 
-        if subcommand == 'startapp':
-            StartAppCommand().run(self.argv[2:])
-            return
-
-        # 2. Management of user commands (Runtime)
-        # Here the magic happens: we create a dynamic Click group
-        
-        # We need to ensure that settings is accessible before loading the loader
-        if "YOTTA_SETTINGS_MODULE" not in os.environ:
-             # Fallback simple for development, but manage.py already does this
-             pass
-
+        # 1. Management of system commands and user commands (Runtime)
         from yotta.core.loader import AppLoader
-        
-        loader = AppLoader()
-        discovered_commands = loader.get_commands()
 
-        # We create a root Click Group that contains all the discovered commands
-        @click.group()
-        def cli():
-            pass
+        settings_error = None
+        discovered_commands = {}
+        loader_kwargs = {
+            "quiet": "--quiet" in self.argv,
+            "verbose": "--verbose" in self.argv,
+            "strict": "--strict" in self.argv,
+        }
+        try:
+            loader = AppLoader(**loader_kwargs)
+            discovered_commands = loader.get_commands()
+        except ImportError as exc:
+            settings_error = str(exc)
 
-        # We attach each discovered command to the root group
+        # Root Click Group
+        @click.group(invoke_without_command=True)
+        @click.option("--quiet", is_flag=True, help="Silence loader warnings.")
+        @click.option("--verbose", is_flag=True, help="Show loader details.")
+        @click.option("--strict", is_flag=True, help="Fail fast on missing or broken commands modules.")
+        @click.pass_context
+        def cli(ctx, quiet, verbose, strict):
+            if ctx.invoked_subcommand is None:
+                click.echo(ctx.get_help())
+                if settings_error:
+                    click.echo(f"\n[Settings error] {settings_error}")
+
+        # Attach bootstrap commands
+        for name, cmd in base_commands.items():
+            cli.add_command(cmd, name=name)
+
+        # Guard: if settings are missing and user asks for non-bootstrap command, show error early
+        if settings_error and subcommand and subcommand not in base_commands:
+            self.console.print(f"[bold red]Settings error:[/] {settings_error}")
+            self.console.print("Set YOTTA_SETTINGS_MODULE (or YOTTA_ENV / .env) before running commands.")
+            return
+
+        # Attach discovered commands
         for name, cmd in discovered_commands.items():
             cli.add_command(cmd, name=name)
 
-        # We launch Click (it will parse sys.argv automatically)
-        try:
-            # prog_name allows to display 'manage.py' in the help instead of the python script
-            cli(prog_name="manage.py")
-        except Exception as e:
-            # Here we could add a nice error handler with Rich
-            raise e
+        # Launch Click
+        cli(prog_name="manage.py")
 
 def execute_from_command_line(argv=None):
     utility = yottaUtility(argv)

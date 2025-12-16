@@ -53,18 +53,24 @@ yotta scaffolds the entire folder structure for you.
 ```bash
 yotta startproject my_cli
 cd my_cli
+# A pyproject.toml and .env.example (with YOTTA_SETTINGS_MODULE) are created for you
 ```
 2. Create an app (module)
 ```bash
 uv run manage.py startapp inventory
 ```
-> Note: Don't forget to add 'src.inventory' to INSTALLED_APPS in your yotta_settings.py file.
-3. Write your first command
+> Note: Don't forget to add 'my_cli.inventory' (replace with your project name) to INSTALLED_APPS in your settings.py file.
+3. Scaffold a command interactively (optional)
+```bash
+python manage.py startcommand
+```
+Follow the prompts to pick the target app, command name, arguments, and options. yotta will append a ready-to-edit function to the selected app's `commands.py`.
+4. Write your first command
 In src/inventory/commands.py:
 ```python
 from yotta.cli.decorators import command, argument
 from yotta.core.context import Context
-from yotta.cli.types import EMAIL
+from yotta.core.types import EMAIL
 
 @command(name="add_user", help="Adds a user to the inventory")
 @argument("email", type=EMAIL)
@@ -86,10 +92,19 @@ def add_user(yotta: Context, email: str):
     )
 
 ```
-4. Run the command
+5. Run the command
 ```bash
 python manage.py add_user contact@example.com
 ```
+
+### Settings and environment
+- `YOTTA_SETTINGS_MODULE` is loaded from `.env` or `.env.local` (the latter overrides).
+- You can also set `YOTTA_ENV=prod` to auto-load `settings_prod.py`.
+- `YOTTA_DEBUG=1` will surface full tracebacks during settings import and loader errors.
+
+### Debugging imports and discovery
+- Loader warnings surface when an app has no `commands.py`; use `--verbose` for extra details or `--quiet` to silence.
+- Use `--strict` to fail fast on missing/broken command modules (useful in CI).
 
 ## TUI Mode (Textual Integration)
 Need a real-time interactive dashboard? yotta integrates Textual natively.
@@ -165,7 +180,7 @@ panel = rich.panel("Content", title="Info")
 
 This singleton approach provides seamless access to all Rich functionality through a single import, keeping your code clean and consistent.
 
-### Smart Types (yotta.cli.types)
+### Smart Types (yotta.core.types)
 
 Validate user input without writing a single if/else.
 
@@ -175,12 +190,26 @@ Validate user input without writing a single if/else.
 
 `Range(min=18, max=99)`: Enforces numeric range.
 
+`Choice([...])`: Restrict values to a predefined list (case-insensitive by default).
+
+`Path() / Directory()`: Validate existing filesystem paths (files or directories).
+
+`UUID()`: Validate UUID strings.
+
+`URL()`: Validate http/https URLs.
+
+`JSON()`: Accept JSON strings or paths to JSON files, returns parsed objects.
+
+`Port(min,max)`: Validate port numbers in the allowed range.
+
+`EnumChoice(MyEnum)`: Use Python Enums as a source of allowed values.
+
 ## Project Structure
 ```
 my_cli/
 ├── manage.py            # Entry point (Django-like)
-├── yotta_settings.py     # Global configuration
-└── src/                 # Your applications folder
+├── settings.py          # Global configuration
+└── my_cli/              # Your applications folder (as a package)
     ├── main/
     │   ├── commands.py  # Your CLI commands
     │   └── ui.py        # Your visual components

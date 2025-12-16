@@ -23,10 +23,14 @@ license-files = ["LICENSE"]
 [project.scripts]
 yotta = "yotta.__main__:main"
 
+[project.optional-dependencies]
+test = ["pytest>=7.0"]
+
 [tool.uv.workspace]
 members = [
     "mon-projet",
 ]
+
 
 [tool.setuptools]
 packages = ["yotta"]

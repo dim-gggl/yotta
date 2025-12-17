@@ -6,6 +6,10 @@ from rich.console import Console
 from yotta.conf import settings
 
 
+class DuplicateCommandNameError(RuntimeError):
+    """Raised when two apps expose the same click command name under strict mode."""
+
+
 class _LoaderLogger:
     def __init__(self, quiet: bool = False, verbose: bool = False):
         self.console = Console()
@@ -30,11 +34,12 @@ class AppLoader:
         self.logger = _LoaderLogger(quiet=quiet, verbose=verbose)
         self.strict = strict
 
-    def get_commands(self):
+    def get_commands(self) -> dict[str, click.Command]:
         """
         Scan all installed apps and return a dict {name: click_command}.
         """
-        commands = {}
+        commands: dict[str, click.Command] = {}
+        command_sources: dict[str, tuple[str, str]] = {}  # cmd_name -> (module_name, attribute_name)
 
         for app_path in self.apps:
             module_name = f"{app_path}.commands"
@@ -59,6 +64,17 @@ class AppLoader:
             for attr_name, attr_value in vars(mod).items():
                 if isinstance(attr_value, click.Command):
                     cmd_name = attr_value.name or attr_name
+                    if cmd_name in commands:
+                        prev_module, prev_attr = command_sources.get(cmd_name, ("<unknown>", "<unknown>"))
+                        msg = (
+                            f"Duplicate command name '{cmd_name}' discovered. "
+                            f"Both '{prev_module}:{prev_attr}' and '{module_name}:{attr_name}' define it. "
+                            f"Keeping the last one ('{module_name}:{attr_name}')."
+                        )
+                        if self.strict:
+                            raise DuplicateCommandNameError(msg)
+                        self.logger.warn(msg)
                     commands[cmd_name] = attr_value
+                    command_sources[cmd_name] = (module_name, attr_name)
 
         return commands

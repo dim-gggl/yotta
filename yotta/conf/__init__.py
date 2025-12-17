@@ -11,6 +11,9 @@ class Settings:
         self._env_loaded = False
         self._sys_path_added = False
         self.debug_enabled = False
+        # Load environment files early so flags like YOTTA_DEBUG are available
+        # even if the caller never triggers settings module import via __getattr__.
+        self._load_env()
 
     def _setup(self):
         """Load the settings module defined in the environment."""

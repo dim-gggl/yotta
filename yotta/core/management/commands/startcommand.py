@@ -16,22 +16,34 @@ class StartCommandCommand:
         try:
             from yotta.conf import settings
         except ImportError as exc:  # pragma: no cover - defensive guard for missing settings
-            self.console.print(f"[bold red]Error:[/] Unable to load settings: {exc}")
+            self.console.print(
+                "[bold red]Error:[/] "
+                f"Unable to load settings: {exc}"
+            )
             return
 
         installed_apps = getattr(settings, "INSTALLED_APPS", [])
         if not installed_apps:
-            self.console.print("[bold red]Error:[/] No INSTALLED_APPS configured. Run this inside a yotta project.")
+            self.console.print(
+                "[bold red]Error:[/] No INSTALLED_APPS configured. "
+                "Run this inside a yotta project."
+            )
             return
 
         app_path = app or self._select_app(installed_apps)
         if not app_path:
-            self.console.print("[yellow]Command creation cancelled.[/]")
+            self.console.print(
+                "[yellow]No app selected. "
+                "Nothing was created.[/]"
+            )
             return
 
         commands_file = self._resolve_commands_file(app_path)
         if commands_file is None:
-            self.console.print(f"[bold red]Error:[/] Could not resolve a module path for '{app_path}'.")
+            self.console.print(
+                "[bold red]Error:[/] Could not resolve a "
+                f"module path for '{app_path}'."
+            )
             return
 
         os.makedirs(os.path.dirname(commands_file), exist_ok=True)
@@ -53,15 +65,6 @@ class StartCommandCommand:
             f.write(command_block)
 
         self.console.print(f"[green]Added[/] command '{config['name']}' to {commands_file}")
-
-
-@click.command(name="startcommand", help="Interactively scaffold a new command in an installed app.")
-@click.option("--app", "app_name", default=None, help="Preselect the target app (module path).")
-def startcommand_command(app_name: Optional[str] = None) -> None:
-    """
-    Click entry point to launch the interactive command creator.
-    """
-    StartCommandCommand().run([], app=app_name)
 
     def _select_app(self, installed_apps: List[str]) -> Optional[str]:
         if len(installed_apps) == 1:
@@ -228,3 +231,12 @@ def startcommand_command(app_name: Optional[str] = None) -> None:
 
     def _to_identifier(self, raw: str) -> str:
         return raw.strip().replace(" ", "_").replace("-", "_")
+
+
+@click.command(name="startcommand", help="Interactively scaffold a new command in an installed app.")
+@click.option("--app", "app_name", default=None, help="Preselect the target app (module path).")
+def startcommand_command(app_name: Optional[str] = None) -> None:
+    """
+    Click entry point to launch the interactive command creator.
+    """
+    StartCommandCommand().run([], app=app_name)

@@ -57,26 +57,29 @@ cd my_cli
 ```
 2. Create an app (module)
 ```bash
-uv run manage.py startapp inventory
+uv run python manage.py startapp inventory
 ```
 > Note: Don't forget to add 'my_cli.inventory' (replace with your project name) to INSTALLED_APPS in your settings.py file.
 3. Scaffold a command interactively (optional)
 ```bash
-python manage.py startcommand
+uv run python manage.py startcommand
 ```
 Follow the prompts to pick the target app, command name, arguments, and options. yotta will append a ready-to-edit function to the selected app's `commands.py`.
 4. Write your first command
 In src/inventory/commands.py:
 ```python
 from yotta.cli.decorators import command, argument
-from yotta.core.context import Context
+from yotta.core.context import YottaContext
 from yotta.core.types import EMAIL
 
 @command(name="add_user", help="Adds a user to the inventory")
 @argument("email", type=EMAIL)
-def add_user(yotta: Context, email: str):
+def add_user(yotta: YottaContext, email: str):
     # Using the native UI engine
     yotta.ui.header("New User")
+    # Access project configuration without extra imports
+    # (settings are loaded lazily on first attribute access)
+    _ = yotta.settings
     
     with yotta.ui.spinner("Checking database..."):
         # Simulate work
@@ -94,13 +97,21 @@ def add_user(yotta: Context, email: str):
 ```
 5. Run the command
 ```bash
-python manage.py add_user contact@example.com
+uv run python manage.py add_user contact@example.com
 ```
 
 ### Settings and environment
 - `YOTTA_SETTINGS_MODULE` is loaded from `.env` or `.env.local` (the latter overrides).
 - You can also set `YOTTA_ENV=prod` to auto-load `settings_prod.py`.
 - `YOTTA_DEBUG=1` will surface full tracebacks during settings import and loader errors.
+- `THEME` controls the console palette. Supported values: `"default"`, `"dark"` (unknown values fall back to `"default"`).
+
+To override the theme, set it in your project's `settings.py`:
+
+```python
+# settings.py
+THEME = "dark"
+```
 
 ### Debugging imports and discovery
 - Loader warnings surface when an app has no `commands.py`; use `--verbose` for extra details or `--quiet` to silence.

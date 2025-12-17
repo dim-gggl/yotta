@@ -27,9 +27,10 @@ class yottaUtility:
         }
 
         # 1. Management of system commands and user commands (Runtime)
-        from yotta.core.loader import AppLoader
+        from yotta.core.loader import AppLoader, DuplicateCommandNameError
 
         settings_error = None
+        discovery_error = None
         discovered_commands = {}
         loader_kwargs = {
             "quiet": "--quiet" in self.argv,
@@ -41,6 +42,8 @@ class yottaUtility:
             discovered_commands = loader.get_commands()
         except ImportError as exc:
             settings_error = str(exc)
+        except DuplicateCommandNameError as exc:
+            discovery_error = str(exc)
 
         # Root Click Group
         @click.group(invoke_without_command=True)
@@ -53,6 +56,8 @@ class yottaUtility:
                 click.echo(ctx.get_help())
                 if settings_error:
                     click.echo(f"\n[Settings error] {settings_error}")
+                if discovery_error:
+                    click.echo(f"\n[Discovery error] {discovery_error}")
 
         # Attach bootstrap commands
         for name, cmd in base_commands.items():
@@ -63,6 +68,9 @@ class yottaUtility:
             self.console.print(f"[bold red]Settings error:[/] {settings_error}")
             self.console.print("Set YOTTA_SETTINGS_MODULE (or YOTTA_ENV / .env) before running commands.")
             return
+        if discovery_error:
+            self.console.print(f"[bold red]Discovery error:[/] {discovery_error}")
+            raise SystemExit(1)
 
         # Attach discovered commands
         for name, cmd in discovered_commands.items():

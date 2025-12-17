@@ -1,6 +1,6 @@
 from typing import List, Optional, Callable, Any
 from yotta.rich_ui import rich
-from yotta.ui.theme import DEFAULT_THEME
+from yotta.ui.theme import DEFAULT_THEME, resolve_theme
 
 
 class yottaConsole:
@@ -11,11 +11,28 @@ class yottaConsole:
     through the unified RichUI interface.
     """
 
-    def __init__(self):
-        self._console = rich.console(theme=DEFAULT_THEME)
+    def __init__(self, theme: str | None = None):
+        """
+        Create a yotta console.
+
+        If `theme` is not provided, yotta will try to read `THEME` from project settings
+        and fall back to the default theme when settings are unavailable or invalid.
+        """
+        theme_name = theme
+        if theme_name is None:
+            try:
+                from yotta.conf import settings as yotta_settings
+
+                theme_name = getattr(yotta_settings, "THEME", "default")
+            except Exception:
+                theme_name = "default"
+
+        self._theme_name = str(theme_name) if theme_name is not None else "default"
+        self._theme = resolve_theme(self._theme_name)
+        self._console = rich.console(theme=self._theme)
 
     def write(self, text: str, style: str = None):
-        """Affiche du texte simple."""
+        """Display plain text."""
         self._console.print(text, style=style)
 
     # --- MESSAGE BLOCKS ---
@@ -34,28 +51,28 @@ class yottaConsole:
 
     def success(self, msg: str):
         """Display a success message."""
-        self._console.print(f"[bold bright_green]✔[/] {msg}")
+        self._console.print(f"[success]✔[/] {msg}")
 
     def error(self, msg: str):
         """Display an error message."""
-        self._console.print(f"[bold bright_red]✖[/] {msg}")
+        self._console.print(f"[error]✖[/] {msg}")
 
     def warning(self, msg: str):
         """Display a warning message."""
-        self._console.print(f"[bold bright_yellow]⚠[/] {msg}")
+        self._console.print(f"[warning]⚠[/] {msg}")
 
     def info(self, msg: str):
         """Display an info message."""
-        self._console.print(f"[bold bright_blue]ℹ[/] {msg}")
+        self._console.print(f"[info]ℹ[/] {msg}")
 
     # --- COMPLEX COMPONENTS ---
 
     def table(self, columns: List[str], rows: List[List[str]], title: str = None):
         """
         Create and display a formatted table automatically.
-        Usage: yotta.ui.table(["Nom", "Âge"], [["Alice", "25"], ["Bob", "30"]])
+        Usage: yotta.ui.table(["Name", "Age"], [["Alice", "25"], ["Bob", "30"]])
         """
-        table = rich.table(title=title, header_style="bold bright_cyan", border_style="primary")
+        table = rich.table(title=title, header_style="secondary", border_style="primary")
 
         for col in columns:
             table.add_column(col)
@@ -125,3 +142,13 @@ class yottaConsole:
         """
         with self.spinner(title):
             return work()
+
+    @property
+    def theme_name(self) -> str:
+        """Return the selected theme name (after normalization)."""
+        return self._theme_name
+
+    @property
+    def theme(self):
+        """Return the resolved Rich Theme instance."""
+        return self._theme

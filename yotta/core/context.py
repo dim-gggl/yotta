@@ -1,4 +1,3 @@
-import rich_click as click
 from yotta.ui.console import yottaConsole
 
 
@@ -12,5 +11,20 @@ class YottaContext:
         # Instantiation of the complete UI engine
         self.ui = yottaConsole()
 
-        # (Placeholder for future settings)
-        self.settings = None
+        # Settings are exposed lazily to avoid triggering imports / file IO
+        # unless the command actually needs configuration.
+        self._settings = None
+
+    @property
+    def settings(self):
+        """
+        Lazily expose the settings singleton.
+
+        This returns `yotta.conf.settings` (a proxy that loads the configured module
+        only when its attributes are accessed).
+        """
+        if self._settings is None:
+            from yotta.conf import settings as settings_singleton
+
+            self._settings = settings_singleton
+        return self._settings

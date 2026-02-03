@@ -1,4 +1,6 @@
 from typing import List, Optional, Callable, Any
+from rich.prompt import Prompt
+from rich.prompt import Confirm
 from yotta.rich_ui import rich
 from yotta.ui.theme import DEFAULT_THEME, resolve_theme
 
@@ -19,7 +21,7 @@ class yottaConsole:
         and fall back to the default theme when settings are unavailable or invalid.
         """
         theme_name = theme
-        if theme_name is None:
+        if not theme_name:
             try:
                 from yotta.conf import settings as yotta_settings
 
@@ -92,19 +94,16 @@ class yottaConsole:
 
     def ask(self, question: str, default: str = None) -> str:
         """Wrapper around Rich Prompt."""
-        from rich.prompt import Prompt
         return Prompt.ask(f"[primary]{question}[/]", default=default, console=self._console)
 
     def confirm(self, question: str, default: bool = True) -> bool:
         """Wrapper around Rich Confirm."""
-        from rich.prompt import Confirm
         return Confirm.ask(f"[primary]{question}[/]", default=default, console=self._console)
 
     def prompt(self, question: str, type_: Callable = str, default: Any = None):
         """
         Prompt for input and optionally validate via a callable/type.
         """
-        from rich.prompt import Prompt
         while True:
             value = Prompt.ask(f"[primary]{question}[/]", default=default, console=self._console)
             try:

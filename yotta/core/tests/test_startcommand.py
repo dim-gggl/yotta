@@ -79,3 +79,4 @@ def test_startcommand_run_cancelled_when_no_app_selected(tmp_path, monkeypatch) 
     assert "No app selected. Nothing was created." in cmd.console.export_text()
 
 
+

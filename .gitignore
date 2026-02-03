@@ -129,4 +129,9 @@ secrets.py
 
 # Development databases
 *.sqlite3
-db.sqlite3
+db.sqlite3.cursorindexingignore
+.specstory
+FEA*.md
+REM*.md
+TO_*.md
+.cursorindexingignore

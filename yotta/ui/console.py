@@ -1,13 +1,17 @@
 from collections.abc import Callable
 from typing import Any
 
+from rich.progress import Progress, TaskID
 from rich.prompt import Confirm, Prompt
+from rich.status import Status
+from rich.theme import Theme
 
+import yotta.conf
 from yotta.rich_ui import rich
 from yotta.ui.theme import resolve_theme
 
 
-class yottaConsole:
+class YottaConsole:
     """
     High-level console wrapper for yotta framework.
 
@@ -15,7 +19,7 @@ class yottaConsole:
     through the unified RichUI interface.
     """
 
-    def __init__(self, theme: str | None = None):
+    def __init__(self, theme: str | None = None) -> None:
         """
         Create a yotta console.
 
@@ -25,9 +29,7 @@ class yottaConsole:
         theme_name = theme
         if not theme_name:
             try:
-                from yotta.conf import settings as yotta_settings
-
-                theme_name = getattr(yotta_settings, "THEME", "default")
+                theme_name = getattr(yotta.conf.settings, "THEME", "default")
             except Exception:
                 theme_name = "default"
 
@@ -35,13 +37,13 @@ class yottaConsole:
         self._theme = resolve_theme(self._theme_name)
         self._console = rich.console(theme=self._theme)
 
-    def write(self, text: str, style: str = None):
+    def write(self, text: str, style: str | None = None) -> None:
         """Display plain text."""
         self._console.print(text, style=style)
 
     # --- MESSAGE BLOCKS ---
 
-    def header(self, title: str, subtitle: str = None):
+    def header(self, title: str, subtitle: str | None = None) -> None:
         """Display a styled large header."""
         content = rich.text(subtitle, style="secondary") if subtitle else None
         self._console.print(
@@ -49,27 +51,27 @@ class yottaConsole:
                 content or "", title=f"[header]{title.upper()}[/]", border_style="primary", expand=False, padding=(1, 2)
             )
         )
-        self._console.print()  # Spacer
+        self._console.print()
 
-    def success(self, msg: str):
+    def success(self, msg: str) -> None:
         """Display a success message."""
         self._console.print(f"[success]✔[/] {msg}")
 
-    def error(self, msg: str):
+    def error(self, msg: str) -> None:
         """Display an error message."""
         self._console.print(f"[error]✖[/] {msg}")
 
-    def warning(self, msg: str):
+    def warning(self, msg: str) -> None:
         """Display a warning message."""
         self._console.print(f"[warning]⚠[/] {msg}")
 
-    def info(self, msg: str):
+    def info(self, msg: str) -> None:
         """Display an info message."""
         self._console.print(f"[info]ℹ[/] {msg}")
 
     # --- COMPLEX COMPONENTS ---
 
-    def table(self, columns: list[str], rows: list[list[str]], title: str = None):
+    def table(self, columns: list[str], rows: list[list[str]], title: str | None = None) -> None:
         """
         Create and display a formatted table automatically.
         Usage: yotta.ui.table(["Name", "Age"], [["Alice", "25"], ["Bob", "30"]])
@@ -80,30 +82,28 @@ class yottaConsole:
             table.add_column(col)
 
         for row in rows:
-            # Convert everything to string to avoid Rich errors
             table.add_row(*[str(r) for r in row])
 
         self._console.print(table)
         self._console.print()
 
-    def panel(self, content: str, title: str = None, style: str = "primary"):
+    def panel(self, content: str, title: str | None = None, style: str = "primary") -> None:
         """Display an information panel."""
         self._console.print(rich.panel(content, title=title, border_style=style))
 
     # --- INTERACTIVITY ---
 
-    def ask(self, question: str, default: str = None) -> str:
+    def ask(self, question: str, default: str | None = None) -> str:
         """Wrapper around Rich Prompt."""
-        return Prompt.ask(f"[primary]{question}[/]", default=default, console=self._console)
+        result = Prompt.ask(f"[primary]{question}[/]", default=default, console=self._console)
+        return result or ""
 
     def confirm(self, question: str, default: bool = True) -> bool:
         """Wrapper around Rich Confirm."""
         return Confirm.ask(f"[primary]{question}[/]", default=default, console=self._console)
 
-    def prompt(self, question: str, type_: Callable = str, default: Any = None):
-        """
-        Prompt for input and optionally validate via a callable/type.
-        """
+    def prompt(self, question: str, type_: Callable = str, default: Any = None) -> Any:
+        """Prompt for input and optionally validate via a callable/type."""
         while True:
             value = Prompt.ask(f"[primary]{question}[/]", default=default, console=self._console)
             try:
@@ -113,14 +113,14 @@ class yottaConsole:
 
     # --- LOADER / SPINNER ---
 
-    def spinner(self, message: str = "Loading..."):
+    def spinner(self, message: str = "Loading...") -> Status:
         """
         Context manager to display a spinner during a long operation.
         Usage: with yotta.ui.spinner("Processing..."): ...
         """
         return self._console.status(f"[bold]{message}[/]", spinner="dots12")
 
-    def progress(self, description: str = "Working..."):
+    def progress(self, description: str = "Working...") -> tuple[Progress, TaskID]:
         """
         Create a Rich progress bar and return a task ID for manual updates.
         Usage:
@@ -135,10 +135,8 @@ class yottaConsole:
         task = progress.add_task(description, total=100)
         return progress, task
 
-    def task(self, title: str, work: Callable[[], Any]):
-        """
-        Simple task runner helper: shows a spinner while executing the callable.
-        """
+    def task(self, title: str, work: Callable[[], Any]) -> Any:
+        """Simple task runner helper: shows a spinner while executing the callable."""
         with self.spinner(title):
             return work()
 
@@ -148,9 +146,9 @@ class yottaConsole:
         return self._theme_name
 
     @property
-    def theme(self):
+    def theme(self) -> Theme:
         """Return the resolved Rich Theme instance."""
         return self._theme
 
 
-YottaConsole = yottaConsole
+yottaConsole = YottaConsole

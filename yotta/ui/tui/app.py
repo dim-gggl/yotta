@@ -1,22 +1,20 @@
 from textual.app import App, ComposeResult
 from textual.binding import Binding
-from textual.widgets import Footer, Header
+from textual.widgets import Footer, Header, Label
 
 
-class yottaApp(App):
+class YottaApp(App):
     """
     The base class for all TUI interfaces in yotta.
     It pre-configures the shortcuts and the base theme.
     """
 
-    # Default CSS configuration to resemble yotta
     CSS = """
     Screen {
         background: $surface;
     }
     """
 
-    # Global bindings (available everywhere in the app)
     BINDINGS = [
         Binding("q", "quit", "Quit", show=True),
         Binding("d", "toggle_dark", "Dark Theme"),
@@ -32,16 +30,13 @@ class yottaApp(App):
         we display an empty structure with Header/Footer.
         """
         yield Header(show_clock=True)
-        yield self.get_content()  # Hook for the user
+        yield self.get_content()
         yield Footer()
 
-    def get_content(self):
+    def get_content(self) -> Label:
         """
-        Method to override by the user to insert his widgets
-        if he wants to keep the default Header/Footer.
+        Override this method to insert widgets while keeping the default Header/Footer.
         """
-        from textual.widgets import Label
-
         return Label("Override the `compose()` or `get_content()` method to display your widgets.")
 
     def action_toggle_dark(self) -> None:
@@ -49,4 +44,4 @@ class yottaApp(App):
         self.dark = not self.dark
 
 
-YottaApp = yottaApp
+yottaApp = YottaApp

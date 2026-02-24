@@ -1,19 +1,25 @@
-from yotta.ui.console import yottaConsole
+from collections.abc import Callable
+from typing import Any
+
+from yotta.conf import settings as _settings_singleton
+from yotta.ui.console import YottaConsole
+
+# Default UI factory — can be overridden for testing or alternative UI backends.
+_default_ui_factory: Callable[[], Any] = YottaConsole
 
 
 class YottaContext:
     """
     The yotta context that travels from command to command.
     It contains the settings and the UI engine.
+
+    The UI is injected via *ui_factory* so that ``core`` depends on a callable
+    rather than a concrete class, keeping the layer boundary explicit.
     """
 
-    def __init__(self, click_ctx):
+    def __init__(self, click_ctx, ui_factory: Callable[[], Any] | None = None) -> None:
         self.click_ctx = click_ctx
-        # Instantiation of the complete UI engine
-        self.ui = yottaConsole()
-
-        # Settings are exposed lazily to avoid triggering imports / file IO
-        # unless the command actually needs configuration.
+        self.ui = (ui_factory or _default_ui_factory)()
         self._settings = None
 
     @property
@@ -25,7 +31,5 @@ class YottaContext:
         only when its attributes are accessed).
         """
         if not self._settings:
-            from yotta.conf import settings as settings_singleton
-
-            self._settings = settings_singleton
+            self._settings = _settings_singleton
         return self._settings

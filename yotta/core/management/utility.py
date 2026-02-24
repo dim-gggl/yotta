@@ -94,7 +94,7 @@ class YottaUtility:
         cli(prog_name=self.prog_name)
 
 
-yottaUtility = YottaUtility
+yottaUtility = YottaUtility  # deprecated alias
 
 
 def execute_from_command_line(argv=None):

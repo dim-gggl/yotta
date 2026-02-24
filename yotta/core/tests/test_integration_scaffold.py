@@ -19,9 +19,11 @@ def test_scaffold_and_help(tmp_path, monkeypatch):
     StartProjectCommand().create_structure(str(project_root), project_name, settings_module, force=True)
     StartAppCommand().create_structure(str(project_root / project_name / "inventory"), "inventory", force=True)
 
+    # Make the scaffolded project importable so _resolve_commands_file works
+    monkeypatch.syspath_prepend(str(project_root))
+
     # Add a command via startcommand
     start_cmd = StartCommandCommand()
-    # Mock prompt selections
     monkeypatch.setattr(start_cmd, "_select_app", lambda apps: f"{project_name}.inventory")
     monkeypatch.setattr(
         start_cmd,

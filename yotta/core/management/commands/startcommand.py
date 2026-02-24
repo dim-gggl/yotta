@@ -6,6 +6,9 @@ from typing import Any
 
 import rich_click as click
 from rich.console import Console
+from rich.prompt import Confirm, Prompt
+
+import yotta.conf
 
 
 class StartCommandCommand:
@@ -15,18 +18,14 @@ class StartCommandCommand:
         self.console = Console()
 
     def run(self, args: list[str], app: str | None = None) -> None:
-        try:
-            from yotta.conf import settings
-        except ImportError as exc:  # pragma: no cover - defensive guard for missing settings
-            self.console.print(f"[bold red]Error:[/] Unable to load settings: {exc}")
-            return
-
-        installed_apps = getattr(settings, "INSTALLED_APPS", [])
-        if not installed_apps:
-            self.console.print("[bold red]Error:[/] No INSTALLED_APPS configured. Run this inside a yotta project.")
-            return
-
-        app_path = app or self._select_app(installed_apps)
+        if app:
+            app_path = app
+        else:
+            installed_apps = getattr(yotta.conf.settings, "INSTALLED_APPS", [])
+            if not installed_apps:
+                self.console.print("[bold red]Error:[/] No INSTALLED_APPS configured. Run this inside a yotta project.")
+                return
+            app_path = self._select_app(installed_apps)
         if not app_path:
             self.console.print("[yellow]No app selected. Nothing was created.[/]")
             return
@@ -66,7 +65,11 @@ class StartCommandCommand:
             self.console.print(f"  {idx}) {app}")
 
         while True:
-            choice = input(f"Choose 1-{len(installed_apps)} (leave empty to cancel): ").strip()
+            choice = Prompt.ask(
+                f"Choose 1-{len(installed_apps)} (leave empty to cancel)",
+                default="",
+                console=self.console,
+            )
             if not choice:
                 return None
             if choice.isdigit():
@@ -101,7 +104,7 @@ class StartCommandCommand:
             self.console.print(f"  [bold red]Cannot derive a valid Python function name from '{name}'.[/]")
             return None
 
-        help_text = input("Description (optional): ").strip()
+        help_text = Prompt.ask("Description (optional)", default="", console=self.console)
 
         arguments: list[dict[str, str]] = []
         while self._confirm("Add a positional argument?"):
@@ -111,13 +114,15 @@ class StartCommandCommand:
         options: list[dict[str, Any]] = []
         while self._confirm("Add an option or flag?"):
             option_name = self._prompt_identifier("  Option name (without dashes)")
-            short_flag = input("  Short flag (single letter, optional): ").strip().lstrip("-")
+            short_flag = Prompt.ask("  Short flag (single letter, optional)", default="", console=self.console).lstrip(
+                "-"
+            )
             is_flag = self._confirm("  Is this a boolean flag (no value)?")
             default = None
             if not is_flag:
-                default_raw = input("  Default value (leave empty for none): ").strip()
+                default_raw = Prompt.ask("  Default value (leave empty for none)", default="", console=self.console)
                 default = default_raw if default_raw else None
-            option_help = input("  Help text (optional): ").strip()
+            option_help = Prompt.ask("  Help text (optional)", default="", console=self.console)
             options.append(
                 {
                     "name": option_name,
@@ -231,17 +236,13 @@ class StartCommandCommand:
 
     def _prompt_required(self, label: str) -> str:
         while True:
-            value = input(f"{label}: ").strip()
+            value = Prompt.ask(label, default="", console=self.console)
             if value:
                 return value
             self.console.print("  Please provide a value.")
 
     def _confirm(self, label: str, default: bool = False) -> bool:
-        suffix = "[Y/n]" if default else "[y/N]"
-        value = input(f"{label} {suffix}: ").strip().lower()
-        if not value:
-            return default
-        return value in ("y", "yes")
+        return Confirm.ask(label, default=default, console=self.console)
 
     def _escape_quotes(self, value: str) -> str:
         return value.replace('"', '\\"')
@@ -289,7 +290,5 @@ class StartCommandCommand:
 @click.command(name="startcommand", help="Interactively scaffold a new command in an installed app.")
 @click.option("--app", "app_name", default=None, help="Preselect the target app (module path).")
 def startcommand_command(app_name: str | None = None) -> None:
-    """
-    Click entry point to launch the interactive command creator.
-    """
+    """Click entry point to launch the interactive command creator."""
     StartCommandCommand().run([], app=app_name)

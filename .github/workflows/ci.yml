@@ -48,12 +48,29 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - run: uv sync --all-extras
-      - run: uv run -m pytest --tb=short -q
+      - run: uv run -m pytest --tb=short -q --cov=yotta --cov-report=term-missing
+
+  security:
+    name: Security audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - run: uv pip install --system pip-audit
+      - run: uv export --no-hashes -o requirements.txt && pip-audit -r requirements.txt
 
   build:
     name: Build package
     runs-on: ubuntu-latest
-    needs: [lint, test]
+    needs: [lint, test, security]
     steps:
       - uses: actions/checkout@v4
 

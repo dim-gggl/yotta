@@ -2,7 +2,6 @@
 
 import os
 import stat
-import time
 
 import rich_click as click
 from rich.console import Console
@@ -52,7 +51,6 @@ class StartProjectCommand:
             refresh_per_second=10,
             transient=True,
         ):
-            time.sleep(1)
             self.create_structure(base_dir, project_name, settings_module, force)
         console.print(f"[green]✔[/] Success! cd {project_name} && python manage.py\n")
 
@@ -109,6 +107,8 @@ if __name__ == "__main__":
 
     def get_settings_template(self, project_name: str, base_dir: str) -> str:
         return f"""
+from pathlib import Path
+
 # yotta settings
 INSTALLED_APPS = [
     "{project_name}.main",
@@ -116,7 +116,7 @@ INSTALLED_APPS = [
 
 THEME = "default"
 
-ROOT_DIR = "{os.path.abspath(base_dir)}"
+ROOT_DIR = Path(__file__).resolve().parent
 """
 
     def get_pyproject_template(self, project_name: str) -> str:

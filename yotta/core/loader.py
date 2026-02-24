@@ -3,6 +3,7 @@ import traceback
 
 import rich_click as click
 from rich.console import Console
+
 from yotta.conf import settings
 
 
@@ -15,6 +16,7 @@ class _LoaderLogger:
         self.console = Console()
         self.quiet = quiet
         self.verbose = verbose
+        self.debug = getattr(settings, "debug_enabled", False)
 
     def warn(self, message: str) -> None:
         if not self.quiet:
@@ -26,6 +28,11 @@ class _LoaderLogger:
 
     def error(self, message: str) -> None:
         self.console.print(f"[bold red]Error:[/] {message}")
+
+    def traceback(self, tb: str) -> None:
+        """Print a traceback only when verbose or YOTTA_DEBUG is on."""
+        if self.verbose or self.debug:
+            self.console.print(tb)
 
 
 class AppLoader:
@@ -50,14 +57,14 @@ class AppLoader:
                 if f"No module named '{module_name}'" in str(e):
                     msg = f"No commands.py found for app '{app_path}'. Skipping."
                     if self.strict:
-                        raise ImportError(msg)
+                        raise ImportError(msg) from e
                     self.logger.warn(msg)
                     continue
                 # unexpected ImportError inside module
                 if self.strict:
                     raise
                 self.logger.error(f"Error importing {module_name}: {e}")
-                self.logger.error(traceback.format_exc())
+                self.logger.traceback(traceback.format_exc())
                 continue
 
             # Introspection : search for click.Command objects in the module

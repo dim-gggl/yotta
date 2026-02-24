@@ -60,4 +60,3 @@ def test_format_default_literal_int_and_float() -> None:
     assert cmd._format_default_literal("42", "port") == "42"
     assert cmd._format_default_literal("3.5", "float") == "3.5"
     assert cmd._format_default_literal("x", "int") == repr("x")
-

@@ -2,7 +2,7 @@ from types import SimpleNamespace
 
 import yotta.conf
 from yotta.ui.console import yottaConsole
-from yotta.ui.theme import DEFAULT_THEME, DARK_THEME
+from yotta.ui.theme import DARK_THEME, DEFAULT_THEME
 
 
 def test_console_uses_theme_from_settings(monkeypatch) -> None:
@@ -32,5 +32,3 @@ def test_console_explicit_theme_overrides_settings(monkeypatch) -> None:
     monkeypatch.setattr(yotta.conf, "settings", SimpleNamespace(THEME="default"))
     ui = yottaConsole(theme="dark")
     assert ui.theme is DARK_THEME
-
-

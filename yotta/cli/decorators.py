@@ -1,13 +1,16 @@
-import rich_click as click
 from functools import wraps
 from typing import Any
 
+import rich_click as click
+
 from yotta.core.context import YottaContext
+
 
 def command(name=None, **kwargs):
     """
     Wrapper around click.command that automatically injects 'ctx'.
     """
+
     def decorator(f):
         @click.command(name=name, **kwargs)
         @click.pass_context
@@ -16,10 +19,14 @@ def command(name=None, **kwargs):
             # Magic transformation: Click Context -> yotta Context
             yotta_ctx = YottaContext(click_ctx)
             return f(yotta_ctx, *args, **kwargs)
+
         return wrapper
+
     return decorator
 
-# The argument and option wrappers (New features)
+
+# The argument and option wrappers
+
 
 def argument(*args, **kwargs):
     """
@@ -55,6 +62,7 @@ def _resolve_type_alias(type_hint: Any):
     alias = type_hint.lower().strip()
     if alias == "email":
         from yotta.core import types as ytypes
+
         return ytypes.EMAIL
     if alias == "int":
         return click.INT
@@ -64,21 +72,27 @@ def _resolve_type_alias(type_hint: Any):
         return click.STRING
     if alias in ("path", "filepath"):
         from yotta.core import types as ytypes
+
         return ytypes.PATH
     if alias in ("dir", "directory"):
         from yotta.core import types as ytypes
+
         return ytypes.DIRECTORY
     if alias == "uuid":
         from yotta.core import types as ytypes
+
         return ytypes.UUID_TYPE
     if alias == "url":
         from yotta.core import types as ytypes
+
         return ytypes.URL
     if alias == "json":
         from yotta.core import types as ytypes
+
         return ytypes.JSON
     if alias == "port":
         from yotta.core import types as ytypes
+
         return ytypes.PORT
 
     # Unknown alias, leave untouched so Click can handle or error

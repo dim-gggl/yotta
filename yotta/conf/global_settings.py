@@ -25,5 +25,3 @@ COMMAND_NAMESPACE_SEPARATOR: str = ":"
 # Entry points should point to an importable app package/module (e.g. "my_pkg.my_app").
 ENABLE_ENTRYPOINT_APPS: bool = True
 ENTRYPOINT_APPS_GROUP: str = "yotta.apps"
-
-

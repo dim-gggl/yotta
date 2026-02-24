@@ -1,6 +1,4 @@
-import os
 import sys
-from pathlib import Path
 
 import rich_click as click
 from click.testing import CliRunner
@@ -13,6 +11,7 @@ def _reset_settings_singleton() -> None:
     # Make diagnostics deterministic for tests by clearing the cached module/env.
     settings_singleton._wrapped = None
     settings_singleton._env_loaded = False
+    settings_singleton._sys_path_added = False
     settings_singleton._project_root = None
     settings_singleton._env_files_loaded = []
     settings_singleton._env_loaded_values = {}

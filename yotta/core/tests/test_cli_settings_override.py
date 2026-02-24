@@ -85,9 +85,3 @@ def beta(yotta: YottaContext):
     assert result.returncode == 0
     assert "alpha command" in result.stdout
     assert "beta command" not in result.stdout
-
-
-
-
-
-

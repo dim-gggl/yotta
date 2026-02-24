@@ -20,70 +20,68 @@ Example:
 # Core Rich imports
 from rich.align import Align
 from rich.bar import Bar
-from rich.box import Box, ROUNDED, HEAVY, DOUBLE, MINIMAL
+from rich.box import DOUBLE, HEAVY, MINIMAL, ROUNDED, Box
+
+# Text and styling
+from rich.color import Color
 from rich.columns import Columns
 from rich.console import Console, Group
 from rich.constrain import Constrain
 from rich.control import Control
+from rich.emoji import Emoji
 from rich.errors import *
+
+# File operations
+from rich.highlighter import *
+from rich.json import JSON
 
 # Layout components
 from rich.layout import Layout
 from rich.live import Live
-from rich.padding import Padding
-from rich.panel import Panel
-
-# Text and styling
-from rich.color import Color
-from rich.emoji import Emoji
-from rich.highlighter import *
-from rich.json import JSON
-from rich.jupyter import JupyterMixin
-from rich.logging import RichHandler
 from rich.markdown import Markdown
 from rich.markup import escape, render
-from rich.pretty import Pretty, pprint, pretty_repr
-from rich.style import Style
-from rich.styled import Styled
-from rich.syntax import Syntax
-from rich.text import Text
-from rich.theme import Theme
-
-# Tables and trees
-from rich.table import Table
-from rich.tree import Tree
-
-# Progress and status
-from rich.progress import (
-    Progress,
-    BarColumn,
-    TextColumn,
-    TimeRemainingColumn,
-    SpinnerColumn,
-    MofNCompleteColumn,
-    DownloadColumn,
-    TransferSpeedColumn,
-    TimeElapsedColumn
-)
-from rich.spinner import Spinner
-from rich.status import Status
-
-# Prompts and interactivity
-from rich.prompt import Prompt, Confirm, IntPrompt, FloatPrompt, InvalidResponse
-
-# Rendering and display
-from rich.rule import Rule
-from rich.segment import Segment
-from rich.traceback import Traceback, install as install_traceback
 
 # Measuring and utilities
 from rich.measure import Measurement
+from rich.padding import Padding
+from rich.panel import Panel
+from rich.pretty import Pretty, pprint, pretty_repr
+
+# Progress and status
+from rich.progress import (
+    BarColumn,
+    DownloadColumn,
+    MofNCompleteColumn,
+    Progress,
+    SpinnerColumn,
+    TextColumn,
+    TimeElapsedColumn,
+    TimeRemainingColumn,
+    TransferSpeedColumn,
+)
+
+# Prompts and interactivity
+from rich.prompt import Confirm, FloatPrompt, IntPrompt, Prompt
 from rich.protocol import is_renderable
+
+# Rendering and display
+from rich.rule import Rule
 from rich.scope import render_scope
 from rich.screen import Screen
+from rich.segment import Segment
+from rich.spinner import Spinner
+from rich.status import Status
+from rich.style import Style
+from rich.styled import Styled
+from rich.syntax import Syntax
 
-# File operations
-from rich.filesize import decimal
+# Tables and trees
+from rich.table import Table
+from rich.text import Text
+from rich.theme import Theme
+from rich.traceback import Traceback
+from rich.traceback import install as install_traceback
+from rich.tree import Tree
 
 # Containers
 try:
@@ -220,7 +218,7 @@ class RichUI:
     def panel(self, *args, **kwargs) -> Panel:
         """Create a Panel."""
         return self._panel(*args, **kwargs)
-    
+
     def panel_fit(self, *args, **kwargs) -> Panel:
         """Create a Panel with fit."""
         return Panel.fit(*args, **kwargs)

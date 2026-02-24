@@ -3,12 +3,13 @@
 import os
 import stat
 import time
+
 import rich_click as click
+from rich.console import Console
 from rich.live import Live
 from rich.text import Text
-from rich.console import Console
-from yotta.ui.spinner import centered_spinner
 
+from yotta.ui.spinner import centered_spinner
 
 console = Console()
 
@@ -47,14 +48,9 @@ class StartProjectCommand:
         console.print()
         os.makedirs(base_dir, exist_ok=True)
         with Live(
-            centered_spinner(
-                message=Text(
-                    f"Creating project at {base_dir}",
-                    style="bold orange_red1"
-                )
-            ),
+            centered_spinner(message=Text(f"Creating project at {base_dir}", style="bold orange_red1")),
             refresh_per_second=10,
-            transient=True
+            transient=True,
         ):
             time.sleep(1)
             self.create_structure(base_dir, project_name, settings_module, force)
@@ -67,7 +63,9 @@ class StartProjectCommand:
         os.makedirs(main_dir, exist_ok=True)
 
         # Files at project root
-        self.write_file(base_dir, "manage.py", self.get_manage_py_template(settings_module), force=force, make_executable=True)
+        self.write_file(
+            base_dir, "manage.py", self.get_manage_py_template(settings_module), force=force, make_executable=True
+        )
         self.write_file(base_dir, "settings.py", self.get_settings_template(project_name, base_dir), force=force)
         self.write_file(base_dir, "pyproject.toml", self.get_pyproject_template(project_name), force=force)
         self.write_file(base_dir, ".env.example", self.get_env_example(settings_module), force=force)
@@ -80,14 +78,16 @@ class StartProjectCommand:
         # Example command
         self.write_file(main_dir, "commands.py", self.get_commands_template(), force=force)
 
-    def write_file(self, path: str, filename: str, content: str, force: bool = False, make_executable: bool = False) -> None:
+    def write_file(
+        self, path: str, filename: str, content: str, force: bool = False, make_executable: bool = False
+    ) -> None:
         """Write content to a file at the specified path."""
         full_path = os.path.join(path, filename)
         if os.path.exists(full_path) and not force:
             console.print(f"[yellow]Skipping[/] existing file {full_path}")
             return
 
-        with open(full_path, 'w', encoding='utf-8') as f:
+        with open(full_path, "w", encoding="utf-8") as f:
             f.write(content)
 
         if make_executable:

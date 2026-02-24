@@ -2,14 +2,15 @@ import json
 import os
 import re
 import uuid
+from collections.abc import Sequence
 from enum import Enum
-from typing import Sequence
 
 import rich_click as click
 
 
 class yottaType(click.ParamType):
     """Base class for yotta custom types."""
+
     pass
 
 
@@ -30,7 +31,7 @@ class FileType(click.File):
     Ex: FileType('w', extension='.csv')
     """
 
-    def __init__(self, mode='r', encoding=None, errors='strict', lazy=None, atomic=False, extension=None):
+    def __init__(self, mode="r", encoding=None, errors="strict", lazy=None, atomic=False, extension=None):
         super().__init__(mode, encoding, errors, lazy, atomic)
         self.extension = extension
 
@@ -78,12 +79,13 @@ class JSONType(yottaType):
     Accepts either a JSON string or a path to a JSON file.
     Returns Python object (dict/list/etc).
     """
+
     name = "json"
 
     def convert(self, value, param, ctx):
         if isinstance(value, str) and os.path.exists(value):
             try:
-                with open(value, "r", encoding="utf-8") as f:
+                with open(value, encoding="utf-8") as f:
                     return json.load(f)
             except Exception as e:
                 self.fail(f"Unable to load JSON file '{value}': {e}", param, ctx)
@@ -129,8 +131,8 @@ STRING = click.STRING
 DIRECTORY = DirectoryType()
 PATH = PathType()
 UUID_TYPE = UUIDType()
-URL = URLType()
-JSON = JSONType()
+URL_TYPE = URLType()
+JSON_TYPE = JSONType()
 PORT = PortType()
 
 
@@ -139,7 +141,7 @@ def Range(min=None, max=None):
     return click.IntRange(min, max)
 
 
-def File(mode='r', extension=None):
+def File(mode="r", extension=None):
     """Factory for our improved file type."""
     return FileType(mode=mode, extension=extension)
 

@@ -48,7 +48,9 @@ def check_command(ctx: click.Context) -> None:
         from yotta.conf import settings
 
         settings_module = os.environ.get("YOTTA_SETTINGS_MODULE")
-        project_root = getattr(settings, "_get_project_root", lambda: None)()  # internal but stable enough for diagnostics
+        project_root = getattr(
+            settings, "_get_project_root", lambda: None
+        )()  # internal but stable enough for diagnostics
         env_files = list(getattr(settings, "env_files_loaded", []))
         installed_apps_raw = getattr(settings, "INSTALLED_APPS", [])
         if installed_apps_raw is None:
@@ -120,7 +122,6 @@ def check_command(ctx: click.Context) -> None:
             commands_module_ok = False
             if f"No module named '{commands_module_name}'" in str(exc):
                 commands_module_missing = True
-                error = f"Missing commands module: {commands_module_name}"
             else:
                 error = f"Error importing {commands_module_name}: {exc}"
         except Exception as exc:
@@ -155,7 +156,9 @@ def check_command(ctx: click.Context) -> None:
 
             apps_table.add_row(
                 r.app_path,
-                "[green]yes[/]" if r.commands_module_ok else ("[yellow]missing[/]" if r.commands_module_missing else "[red]error[/]"),
+                "[green]yes[/]"
+                if r.commands_module_ok
+                else ("[yellow]missing[/]" if r.commands_module_missing else "[red]error[/]"),
                 str(r.commands_count),
                 status,
             )
@@ -188,10 +191,7 @@ def check_command(ctx: click.Context) -> None:
             continue
 
         for cmd_name, _cmd in module_commands:
-            if namespace_mode == "prefix":
-                effective = f"{app_label}{namespace_sep}{cmd_name}"
-            else:
-                effective = cmd_name
+            effective = f"{app_label}{namespace_sep}{cmd_name}" if namespace_mode == "prefix" else cmd_name
             src = f"{commands_module_name}:{cmd_name}"
             if effective in effective_names:
                 duplicates.setdefault(effective, []).extend([effective_names[effective], src])

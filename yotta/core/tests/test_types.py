@@ -1,8 +1,9 @@
-import pytest
+from enum import Enum
+
 import click
+import pytest
 
 from yotta.core import types
-from enum import Enum
 
 
 def test_email_type_accepts_valid_and_rejects_invalid():
@@ -71,5 +72,6 @@ def test_enum_choice():
     class Color(Enum):
         RED = "red"
         BLUE = "blue"
+
     choice = types.EnumChoice(Color)
     assert choice.convert("red", None, None) == "red"

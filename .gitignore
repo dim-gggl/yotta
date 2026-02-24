@@ -91,6 +91,9 @@ temp/
 # Specific agent directories and files requested
 .AGENTS/
 AGENTS.md
+docs/plans
+
+review.md
 
 # General AI agent artifacts, caches, and temporary outputs
 agent_logs/
@@ -129,7 +132,7 @@ secrets.py
 
 # Development databases
 *.sqlite3
-db.sqlite3.cursorindexingignore
+db.sqlite3
 .specstory
 FEA*.md
 REM*.md

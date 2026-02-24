@@ -1,8 +1,10 @@
-from typing import List, Optional, Callable, Any
-from rich.prompt import Prompt
-from rich.prompt import Confirm
+from collections.abc import Callable
+from typing import Any
+
+from rich.prompt import Confirm, Prompt
+
 from yotta.rich_ui import rich
-from yotta.ui.theme import DEFAULT_THEME, resolve_theme
+from yotta.ui.theme import resolve_theme
 
 
 class yottaConsole:
@@ -42,13 +44,11 @@ class yottaConsole:
     def header(self, title: str, subtitle: str = None):
         """Display a styled large header."""
         content = rich.text(subtitle, style="secondary") if subtitle else None
-        self._console.print(rich.panel(
-            content or "",
-            title=f"[header]{title.upper()}[/]",
-            border_style="primary",
-            expand=False,
-            padding=(1, 2)
-        ))
+        self._console.print(
+            rich.panel(
+                content or "", title=f"[header]{title.upper()}[/]", border_style="primary", expand=False, padding=(1, 2)
+            )
+        )
         self._console.print()  # Spacer
 
     def success(self, msg: str):
@@ -69,7 +69,7 @@ class yottaConsole:
 
     # --- COMPLEX COMPONENTS ---
 
-    def table(self, columns: List[str], rows: List[List[str]], title: str = None):
+    def table(self, columns: list[str], rows: list[list[str]], title: str = None):
         """
         Create and display a formatted table automatically.
         Usage: yotta.ui.table(["Name", "Age"], [["Alice", "25"], ["Bob", "30"]])
@@ -151,3 +151,6 @@ class yottaConsole:
     def theme(self):
         """Return the resolved Rich Theme instance."""
         return self._theme
+
+
+YottaConsole = yottaConsole

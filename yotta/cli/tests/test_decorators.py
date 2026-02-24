@@ -1,5 +1,3 @@
-import click
-import pytest
 from click.testing import CliRunner
 
 from yotta.cli.decorators import argument, command, option
@@ -30,7 +28,7 @@ def test_argument_and_option_resolve_type_aliases(tmp_path):
     @option("--src", type="path", default=str(tmp_path))
     @option("--dst", type="directory", default=str(tmp_path))
     def paths_cmd(yotta_ctx, email, src, dst):
-        yotta_ctx.ui  # accessed to ensure context exists
+        assert yotta_ctx.ui
 
     params = {param.name: param for param in paths_cmd.params}
 

@@ -9,5 +9,3 @@ def test_context_exposes_settings_singleton_lazily() -> None:
     assert ctx.settings is settings_singleton
     # Cached on the context instance
     assert ctx.settings is settings_singleton
-
-

@@ -6,16 +6,6 @@ CLI-related types to be importable from `yotta.cli.types`.
 """
 
 from yotta.core.types import (  # noqa: F401
-    Choice,
-    Directory,
-    EnumChoice,
-    File,
-    JSON,
-    Path,
-    Port,
-    Range,
-    URL,
-    UUID,
     DIRECTORY,
     EMAIL,
     FLOAT,
@@ -26,6 +16,16 @@ from yotta.core.types import (  # noqa: F401
     STRING,
     URL_TYPE,
     UUID_TYPE,
+    Choice,
+    Directory,
+    EnumChoice,
+    File,
+    JSON,
+    Path,
+    Port,
+    Range,
+    URL,
+    UUID,
 )
 
 __all__ = [
@@ -40,7 +40,7 @@ __all__ = [
     "Range",
     "URL",
     "UUID",
-    # ParamType instances / aliases
+    # ParamType singleton instances
     "DIRECTORY",
     "EMAIL",
     "FLOAT",
@@ -52,4 +52,3 @@ __all__ = [
     "URL_TYPE",
     "UUID_TYPE",
 ]
-

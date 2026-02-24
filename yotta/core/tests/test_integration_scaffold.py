@@ -1,13 +1,12 @@
 import os
 import subprocess
 import sys
-from pathlib import Path
 
 import pytest
 
-from yotta.core.management.commands.startproject import StartProjectCommand
 from yotta.core.management.commands.startapp import StartAppCommand
 from yotta.core.management.commands.startcommand import StartCommandCommand
+from yotta.core.management.commands.startproject import StartProjectCommand
 
 
 @pytest.mark.integration
@@ -24,13 +23,17 @@ def test_scaffold_and_help(tmp_path, monkeypatch):
     start_cmd = StartCommandCommand()
     # Mock prompt selections
     monkeypatch.setattr(start_cmd, "_select_app", lambda apps: f"{project_name}.inventory")
-    monkeypatch.setattr(start_cmd, "_prompt_command_config", lambda: {
-        "name": "demo",
-        "function_name": "demo",
-        "help": "demo command",
-        "arguments": [],
-        "options": [],
-    })
+    monkeypatch.setattr(
+        start_cmd,
+        "_prompt_command_config",
+        lambda: {
+            "name": "demo",
+            "function_name": "demo",
+            "help": "demo command",
+            "arguments": [],
+            "options": [],
+        },
+    )
     start_cmd.run([], app=f"{project_name}.inventory")
 
     # Write a minimal manage.py compatible invocation

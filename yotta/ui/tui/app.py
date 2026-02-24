@@ -1,13 +1,14 @@
 from textual.app import App, ComposeResult
-from textual.widgets import Header, Footer
 from textual.binding import Binding
+from textual.widgets import Footer, Header
+
 
 class yottaApp(App):
     """
     The base class for all TUI interfaces in yotta.
     It pre-configures the shortcuts and the base theme.
     """
-    
+
     # Default CSS configuration to resemble yotta
     CSS = """
     Screen {
@@ -31,7 +32,7 @@ class yottaApp(App):
         we display an empty structure with Header/Footer.
         """
         yield Header(show_clock=True)
-        yield self.get_content() # Hook for the user
+        yield self.get_content()  # Hook for the user
         yield Footer()
 
     def get_content(self):
@@ -40,8 +41,12 @@ class yottaApp(App):
         if he wants to keep the default Header/Footer.
         """
         from textual.widgets import Label
+
         return Label("Override the `compose()` or `get_content()` method to display your widgets.")
 
     def action_toggle_dark(self) -> None:
         """Toggle between light and dark mode."""
         self.dark = not self.dark
+
+
+YottaApp = yottaApp

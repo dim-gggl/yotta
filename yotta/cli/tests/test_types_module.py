@@ -1,5 +1,5 @@
 def test_cli_types_module_reexports_core_types():
-    from yotta.cli.types import EMAIL, PATH, DIRECTORY, UUID_TYPE, URL_TYPE, JSON_TYPE, PORT
+    from yotta.cli.types import DIRECTORY, EMAIL, JSON_TYPE, PATH, PORT, URL_TYPE, UUID_TYPE
     from yotta.core import types as ytypes
 
     assert EMAIL is ytypes.EMAIL

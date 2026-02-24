@@ -4,12 +4,18 @@ import types
 import click
 import pytest
 
-from yotta.conf import settings
 from yotta.core.loader import AppLoader, DuplicateCommandNameError
 
 
+def _fake_settings(**attrs):
+    """Return a lightweight stand-in for the settings proxy."""
+    defaults = {"INSTALLED_APPS": [], "debug_enabled": False}
+    defaults.update(attrs)
+    return types.SimpleNamespace(**defaults)
+
+
 def test_loader_warns_when_commands_module_missing(monkeypatch, capsys):
-    monkeypatch.setattr(settings, "INSTALLED_APPS", ["myapp"], raising=False)
+    monkeypatch.setattr("yotta.core.loader.settings", _fake_settings(INSTALLED_APPS=["myapp"]))
 
     def fake_import(name):
         raise ImportError(f"No module named '{name}'")
@@ -25,7 +31,7 @@ def test_loader_warns_when_commands_module_missing(monkeypatch, capsys):
 
 
 def test_loader_raises_non_missing_import_error(monkeypatch):
-    monkeypatch.setattr(settings, "INSTALLED_APPS", ["badapp"], raising=False)
+    monkeypatch.setattr("yotta.core.loader.settings", _fake_settings(INSTALLED_APPS=["badapp"]))
 
     def fake_import(name):
         raise ImportError("crash")
@@ -37,8 +43,62 @@ def test_loader_raises_non_missing_import_error(monkeypatch):
         loader.get_commands()
 
 
+def test_loader_hides_traceback_by_default(monkeypatch, capsys):
+    monkeypatch.setattr("yotta.core.loader.settings", _fake_settings(INSTALLED_APPS=["broken"]))
+
+    def fake_import(name):
+        raise ImportError("some internal error")
+
+    monkeypatch.setattr(importlib, "import_module", fake_import)
+
+    loader = AppLoader()
+    loader.get_commands()
+
+    out = capsys.readouterr().out
+    assert "Error importing broken.commands" in out
+    assert "Traceback" not in out
+
+
+def test_loader_shows_traceback_in_verbose_mode(monkeypatch, capsys):
+    monkeypatch.setattr("yotta.core.loader.settings", _fake_settings(INSTALLED_APPS=["broken"]))
+
+    def fake_import(name):
+        raise ImportError("some internal error")
+
+    monkeypatch.setattr(importlib, "import_module", fake_import)
+
+    loader = AppLoader(verbose=True)
+    loader.get_commands()
+
+    out = capsys.readouterr().out
+    assert "Error importing broken.commands" in out
+    assert "Traceback" in out
+
+
+def test_loader_shows_traceback_when_debug_enabled(monkeypatch, capsys):
+    monkeypatch.setattr(
+        "yotta.core.loader.settings",
+        _fake_settings(
+            INSTALLED_APPS=["broken"],
+            debug_enabled=True,
+        ),
+    )
+
+    def fake_import(name):
+        raise ImportError("some internal error")
+
+    monkeypatch.setattr(importlib, "import_module", fake_import)
+
+    loader = AppLoader()
+    loader.get_commands()
+
+    out = capsys.readouterr().out
+    assert "Error importing broken.commands" in out
+    assert "Traceback" in out
+
+
 def test_loader_collects_commands(monkeypatch):
-    monkeypatch.setattr(settings, "INSTALLED_APPS", ["demo"], raising=False)
+    monkeypatch.setattr("yotta.core.loader.settings", _fake_settings(INSTALLED_APPS=["demo"]))
 
     cmd = click.command(name="hello")(lambda: None)
     module = types.SimpleNamespace(hello=cmd)
@@ -58,7 +118,7 @@ def test_loader_collects_commands(monkeypatch):
 
 
 def test_loader_warns_on_duplicate_command_names_and_keeps_last(monkeypatch, capsys):
-    monkeypatch.setattr(settings, "INSTALLED_APPS", ["app1", "app2"], raising=False)
+    monkeypatch.setattr("yotta.core.loader.settings", _fake_settings(INSTALLED_APPS=["app1", "app2"]))
 
     cmd1 = click.command(name="hello")(lambda: None)
     cmd2 = click.command(name="hello")(lambda: None)
@@ -85,7 +145,7 @@ def test_loader_warns_on_duplicate_command_names_and_keeps_last(monkeypatch, cap
 
 
 def test_loader_raises_on_duplicate_command_names_in_strict_mode(monkeypatch):
-    monkeypatch.setattr(settings, "INSTALLED_APPS", ["app1", "app2"], raising=False)
+    monkeypatch.setattr("yotta.core.loader.settings", _fake_settings(INSTALLED_APPS=["app1", "app2"]))
 
     cmd1 = click.command(name="hello")(lambda: None)
     cmd2 = click.command(name="hello")(lambda: None)

@@ -6,6 +6,7 @@ class YottaContext:
     The yotta context that travels from command to command.
     It contains the settings and the UI engine.
     """
+
     def __init__(self, click_ctx):
         self.click_ctx = click_ctx
         # Instantiation of the complete UI engine
@@ -23,7 +24,7 @@ class YottaContext:
         This returns `yotta.conf.settings` (a proxy that loads the configured module
         only when its attributes are accessed).
         """
-        if self._settings is None:
+        if not self._settings:
             from yotta.conf import settings as settings_singleton
 
             self._settings = settings_singleton

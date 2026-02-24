@@ -1,8 +1,9 @@
-import os
 import importlib
+import os
 import sys
 import traceback
-from typing import Dict, Optional
+
+from yotta.conf import global_settings as _defaults
 
 
 class Settings:
@@ -41,9 +42,9 @@ class Settings:
         except ImportError as e:
             if self.debug_enabled:
                 traceback.print_exc()
-            raise ImportError(f"Unable to import settings '{settings_module}': {e}")
+            raise ImportError(f"Unable to import settings '{settings_module}': {e}") from e
 
-    def _load_env(self) -> Dict[str, str]:
+    def _load_env(self) -> dict[str, str]:
         """Lightweight .env loader to populate os.environ before settings import."""
         if self._env_loaded:
             return {}
@@ -52,7 +53,7 @@ class Settings:
             env_path = os.path.join(os.getcwd(), env_file)
             if not os.path.exists(env_path):
                 continue
-            with open(env_path, "r", encoding="utf-8") as f:
+            with open(env_path, encoding="utf-8") as f:
                 for line in f:
                     stripped = line.strip()
                     if not stripped or stripped.startswith("#") or "=" not in stripped:
@@ -76,10 +77,18 @@ class Settings:
         return str(val).lower() in ("1", "true", "yes", "on")
 
     def __getattr__(self, name):
-        """Proxy to access the attributes of the loaded settings module."""
+        """Proxy to access the attributes of the loaded settings module.
+
+        Falls back to ``yotta.conf.global_settings`` when the project module
+        does not define the requested attribute, so optional settings always
+        have a sensible default.
+        """
         if self._wrapped is None:
             self._setup()
-        return getattr(self._wrapped, name)
+        try:
+            return getattr(self._wrapped, name)
+        except AttributeError:
+            return getattr(_defaults, name)
 
 
 # Singleton exported

@@ -1,9 +1,9 @@
-from rich.align import Align
 import pytest
+from rich.align import Align
 
+from yotta.conf import settings
 from yotta.ui.spinner import centered_spinner, spinner
 from yotta.ui.theme import resolve_theme
-from yotta.conf import settings
 
 
 @pytest.fixture(autouse=True)

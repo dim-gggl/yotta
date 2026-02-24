@@ -9,5 +9,3 @@ def test_yotta_context_exposes_settings_singleton_lazily() -> None:
 
     # This should not be None and should be the singleton proxy object.
     assert ctx.settings is settings_singleton
-
-

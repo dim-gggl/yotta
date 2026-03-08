@@ -97,3 +97,32 @@ def test_settings_raises_for_truly_unknown_attribute(tmp_path, monkeypatch):
             _ = s.TOTALLY_NONEXISTENT_SETTING
     finally:
         sys.path[:] = original_sys_path
+
+
+def test_settings_load_from_project_root_when_called_from_nested_directory(tmp_path, monkeypatch):
+    project_root = tmp_path / "my_cli"
+    package_root = project_root / "my_cli" / "main"
+    package_root.mkdir(parents=True)
+
+    (project_root / "manage.py").write_text(
+        "from yotta.core.management import execute_from_command_line\n",
+        encoding="utf-8",
+    )
+    (project_root / "settings.py").write_text('INSTALLED_APPS = ["my_cli.main"]\nVALUE = "ok"\n', encoding="utf-8")
+    (project_root / ".env").write_text("YOTTA_SETTINGS_MODULE=settings\n", encoding="utf-8")
+    (project_root / "my_cli" / "__init__.py").write_text("", encoding="utf-8")
+    (package_root / "__init__.py").write_text("", encoding="utf-8")
+
+    original_sys_path = list(sys.path)
+    monkeypatch.chdir(package_root)
+    monkeypatch.delenv("YOTTA_SETTINGS_MODULE", raising=False)
+    monkeypatch.delenv("YOTTA_ENV", raising=False)
+
+    try:
+        s = Settings()
+        assert s.VALUE == "ok"
+        assert s.INSTALLED_APPS == ["my_cli.main"]
+        assert os.environ["YOTTA_SETTINGS_MODULE"] == "settings"
+        assert str(project_root) in sys.path
+    finally:
+        sys.path[:] = original_sys_path

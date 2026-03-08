@@ -2,6 +2,7 @@ import importlib
 import os
 import sys
 import traceback
+from pathlib import Path
 
 from yotta.conf import global_settings as _defaults
 
@@ -15,6 +16,30 @@ class Settings:
         # Load environment files early so flags like YOTTA_DEBUG are available
         # even if the caller never triggers settings module import via __getattr__.
         self._load_env()
+
+    def _find_project_root(self) -> Path | None:
+        current = Path.cwd().resolve()
+
+        for directory in (current, *current.parents):
+            manage_py = directory / "manage.py"
+            if manage_py.is_file():
+                try:
+                    if "yotta" in manage_py.read_text(encoding="utf-8"):
+                        return directory
+                except OSError:
+                    continue
+
+            pyproject = directory / "pyproject.toml"
+            settings_py = directory / "settings.py"
+            if pyproject.is_file() and settings_py.is_file():
+                try:
+                    content = pyproject.read_text(encoding="utf-8")
+                    if any(name in content for name in ('"yotta"', "'yotta'", '"yotta-framework"', "'yotta-framework'")):
+                        return directory
+                except OSError:
+                    continue
+
+        return None
 
     def _setup(self):
         """Load the settings module defined in the environment."""
@@ -32,9 +57,12 @@ class Settings:
                 "Set it in your environment, in a .env/.env.local file, or via manage.py before running commands."
             )
 
-        # Add the current directory to the path to find the settings file (once)
+        project_root = self._find_project_root()
+        base_path = str(project_root or Path.cwd())
+
+        # Add the project root to the path to find the settings file (once)
         if not self._sys_path_added:
-            sys.path.insert(0, os.getcwd())
+            sys.path.insert(0, base_path)
             self._sys_path_added = True
 
         try:
@@ -49,11 +77,13 @@ class Settings:
         if self._env_loaded:
             return {}
         loaded = {}
+        project_root = self._find_project_root()
+        env_root = project_root or Path.cwd()
         for env_file in (".env", ".env.local"):
-            env_path = os.path.join(os.getcwd(), env_file)
-            if not os.path.exists(env_path):
+            env_path = env_root / env_file
+            if not env_path.exists():
                 continue
-            with open(env_path, encoding="utf-8") as f:
+            with env_path.open(encoding="utf-8") as f:
                 for line in f:
                     stripped = line.strip()
                     if not stripped or stripped.startswith("#") or "=" not in stripped:

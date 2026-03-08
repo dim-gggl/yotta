@@ -10,7 +10,10 @@ from yotta.ui.theme import resolve_theme
 
 class YottaSpinner:
     def __init__(self, message: RenderableType = "Loading...", spinner_name: str = "dots12") -> None:
-        theme_name = getattr(settings, "THEME", "default")
+        try:
+            theme_name = getattr(settings, "THEME", "default")
+        except ImportError:
+            theme_name = "default"
         theme = resolve_theme(theme_name)
         self.renderable = Spinner(spinner_name, message, style=theme.styles["primary"])
         self._status: Any = None

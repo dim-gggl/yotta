@@ -24,7 +24,8 @@ def find_project_root(start: str | None = None) -> Path | None:
                 content = manage_py.read_text(encoding="utf-8")
                 if "yotta" in content:
                     return directory
-            except OSError:
+            except OSError as ex:
+                console.print(f"[bold red]✖ Error[/]: {ex}")
                 continue
 
         pyproject = directory / "pyproject.toml"

@@ -59,7 +59,7 @@ class YottaUtility:
         @click.option("--strict", is_flag=True, help="Fail fast on missing or broken commands modules.")
         @click.pass_context
         def cli(ctx, quiet, verbose, strict):
-            if ctx.invoked_subcommand is None:
+            if not ctx.invoked_subcommand:
                 click.echo(ctx.get_help())
                 if settings_error:
                     click.echo(f"\n[Settings error] {settings_error}")

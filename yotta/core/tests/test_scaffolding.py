@@ -41,6 +41,33 @@ def test_startproject_creates_structure(tmp_path):
     assert f'name = "{project_name}"' in pyproject.read_text()
 
 
+def test_startproject_pyproject_uses_git_source_for_yotta(tmp_path):
+    project_root = tmp_path / "demo"
+
+    cmd = StartProjectCommand()
+    cmd.create_structure(str(project_root), "demo", "settings", force=True)
+
+    pyproject_content = (project_root / "pyproject.toml").read_text()
+
+    assert 'dependencies = ["yotta"]' in pyproject_content
+    assert "[tool.uv.sources]" in pyproject_content
+    assert 'yotta = { git = "https://github.com/dim-gggl/yotta.git" }' in pyproject_content
+
+
+def test_startproject_manage_py_has_no_leading_indentation(tmp_path):
+    project_root = tmp_path / "demo"
+
+    cmd = StartProjectCommand()
+    cmd.create_structure(str(project_root), "demo", "settings", force=True)
+
+    manage_py_content = (project_root / "manage.py").read_text()
+
+    assert "\nimport os\n" in manage_py_content
+    assert "\nimport sys\n" in manage_py_content
+    assert "\n    import os\n" not in manage_py_content
+    assert "\n    import sys\n" not in manage_py_content
+
+
 # ---------------------------------------------------------------------------
 # startapp scaffolding
 # ---------------------------------------------------------------------------

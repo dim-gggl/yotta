@@ -2,6 +2,8 @@
 
 import os
 import stat
+import textwrap
+import time
 
 import rich_click as click
 from rich.console import Console
@@ -11,6 +13,7 @@ from rich.text import Text
 from yotta.ui.spinner import centered_spinner
 
 console = Console()
+YOTTA_REPOSITORY_URL = "https://github.com/dim-gggl/yotta.git"
 
 
 @click.command(name="startproject", help="Scaffold a new yotta project.")
@@ -51,6 +54,7 @@ class StartProjectCommand:
             refresh_per_second=10,
             transient=True,
         ):
+            time.sleep(2)
             self.create_structure(base_dir, project_name, settings_module, force)
         console.print(f"[green]✔[/] Success! cd {project_name} && python manage.py\n")
 
@@ -95,15 +99,21 @@ class StartProjectCommand:
     # --- TEMPLATES ---
 
     def get_manage_py_template(self, settings_module: str) -> str:
-        return f"""#!/usr/bin/env python3
-import os
-import sys
-from yotta.core.management import execute_from_command_line
+        return textwrap.dedent(
+            f"""\
+            #!/usr/bin/env python3
+            # -*- coding: utf-8 -*-
 
-if __name__ == "__main__":
-    os.environ.setdefault("YOTTA_SETTINGS_MODULE", "{settings_module}")
-    execute_from_command_line(sys.argv)
-"""
+            import os
+            import sys
+
+            from yotta.core.management import execute_from_command_line
+
+            if __name__ == "__main__":
+                os.environ.setdefault("YOTTA_SETTINGS_MODULE", "{settings_module}")
+                execute_from_command_line(sys.argv)
+            """
+        )
 
     def get_settings_template(self, project_name: str, base_dir: str) -> str:
         return f"""
@@ -125,10 +135,11 @@ name = "{project_name}"
 version = "0.1.0"
 description = "A yotta project."
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.12"
 dependencies = ["yotta"]
 
-[tool.uv]
+[tool.uv.sources]
+yotta = {{ git = "{YOTTA_REPOSITORY_URL}" }}
 """
 
     def get_env_example(self, settings_module: str) -> str:

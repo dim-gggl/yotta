@@ -1,4 +1,5 @@
 import sys
+from importlib.metadata import PackageNotFoundError
 from importlib.metadata import version as _pkg_version
 
 import rich_click as click
@@ -18,6 +19,17 @@ _BASE_COMMANDS = {
     "check": check_command,
     "completion": completion_command,
 }
+_DISTRIBUTION_NAMES = ("yotta", "yotta-framework")
+
+
+def _resolve_pkg_version() -> str:
+    for distribution_name in _DISTRIBUTION_NAMES:
+        try:
+            return _pkg_version(distribution_name)
+        except PackageNotFoundError:
+            continue
+
+    return "unknown"
 
 
 class YottaUtility:
@@ -50,7 +62,7 @@ class YottaUtility:
         except DuplicateCommandNameError as exc:
             discovery_error = str(exc)
 
-        pkg_version = _pkg_version("yotta")
+        pkg_version = _resolve_pkg_version()
 
         @click.group(invoke_without_command=True)
         @click.version_option(pkg_version, prog_name="yotta", message="%(prog)s %(version)s")

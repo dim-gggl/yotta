@@ -892,7 +892,7 @@ wheels = [
 ]
 
 [[package]]
-name = "yotta"
+name = "yotta-framework"
 version = "1.0"
 source = { editable = "." }
 dependencies = [

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "yotta-framework"
-version = "1.0"
+version = "1.0.1"
 description = "A modern CLI framework based on Click, Rich and Textual."
 readme = "README.md"
 requires-python = ">=3.10"

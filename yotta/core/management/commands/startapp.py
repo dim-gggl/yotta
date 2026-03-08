@@ -6,6 +6,7 @@ import rich_click as click
 from rich.console import Console
 
 console = Console()
+YOTTA_DISTRIBUTION_NAMES = ("yotta", "yotta-framework")
 
 
 def find_project_root(start: str | None = None) -> Path | None:
@@ -33,7 +34,10 @@ def find_project_root(start: str | None = None) -> Path | None:
         if pyproject.is_file() and settings_py.is_file():
             try:
                 content = pyproject.read_text(encoding="utf-8")
-                if '"yotta"' in content or "'yotta'" in content:
+                if any(
+                    f'"{distribution_name}"' in content or f"'{distribution_name}'" in content
+                    for distribution_name in YOTTA_DISTRIBUTION_NAMES
+                ):
                     return directory
             except OSError:
                 continue

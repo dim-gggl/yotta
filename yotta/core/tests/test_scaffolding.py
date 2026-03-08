@@ -49,9 +49,9 @@ def test_startproject_pyproject_uses_git_source_for_yotta(tmp_path):
 
     pyproject_content = (project_root / "pyproject.toml").read_text()
 
-    assert 'dependencies = ["yotta"]' in pyproject_content
+    assert 'dependencies = ["yotta-framework"]' in pyproject_content
     assert "[tool.uv.sources]" in pyproject_content
-    assert 'yotta = { git = "https://github.com/dim-gggl/yotta.git" }' in pyproject_content
+    assert 'yotta-framework = { git = "https://github.com/dim-gggl/yotta.git" }' in pyproject_content
 
 
 def test_startproject_manage_py_has_no_leading_indentation(tmp_path):
@@ -125,7 +125,7 @@ def test_find_project_root_returns_none_outside_project(tmp_path):
 
 def test_find_project_root_fallback_pyproject_and_settings(tmp_path):
     """Detect project root when manage.py is absent but pyproject.toml + settings.py exist."""
-    (tmp_path / "pyproject.toml").write_text('[project]\nname = "mypkg"\ndependencies = ["yotta"]\n')
+    (tmp_path / "pyproject.toml").write_text('[project]\nname = "mypkg"\ndependencies = ["yotta-framework"]\n')
     (tmp_path / "settings.py").write_text("INSTALLED_APPS = []\n")
     result = find_project_root(start=str(tmp_path))
     assert result == tmp_path

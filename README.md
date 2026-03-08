@@ -8,19 +8,19 @@
       <img alt="uv Badge" src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json">
     </a>
     <a href="https://rich.readthedocs.io/en/stable/index.html">
-      <img alt="Static Badge" src="https://img.shields.io/badge/rich-14.1.0%2B-%238b36db">
+      <img alt="Static Badge" src="https://img.shields.io/badge/rich-14.3.3%2B-%238b36db">
     </a>
     <a href="https://click.palletsprojects.com/en/stable/">
       <img alt="Static Badge" src="https://img.shields.io/badge/click-8.3.1%2B-%23cea3c7?style=plastic&logo=click&logoColor=%23cea3c7">
     </a>
     <a href="https://pypi.org/project/rich-click/">
-      <img alt="Yes Yotta Badge" class="" src="https://img.shields.io/badge/rich--click-1.9.4%2B-%23800000?style=plastic&logo=rich-click&logoColor=%23800000">
+      <img alt="Yes Yotta Badge" class="" src="https://img.shields.io/badge/rich--click-1.9.7%2B-%23800000?style=plastic&logo=rich-click&logoColor=%23800000">
     </a>
 </div>
 
-![](./media/yotta_dark.svg)
+![](https://raw.githubusercontent.com/dim-gggl/yotta/main/media/yotta_dark.svg)
 
-Build complete CLIs and TUIs in Python, the fast way. (Django inspired)
+Build complete CLIs and TUIs in Python, the fast way. (Django-inspired)
 
 yotta is designed to simplify the creation of Command Line Interfaces (CLI) and Terminal User Interfaces (TUI).
 
@@ -28,7 +28,7 @@ It combines the robustness of Click, the beauty of Rich, and the interactivity o
 
 ## Why yotta?
 
-As lots of implementation in programming, building a CLI app is always following a universal pattern which yotta tries to simplify in order to program faster while maintaining security and efficience on the forescene.
+Most CLI applications follow the same foundational patterns. yotta packages those patterns into a framework so you can ship faster without giving up structure, readability, or user experience.
 
 Building a CLI app with yotta is making sure to get:
 - Modular Architecture: Split your code into reusable "Apps" (startproject, startapp).
@@ -38,11 +38,31 @@ Building a CLI app with yotta is making sure to get:
 
 ## Installation
 
-For now (local development):
+### Install the CLI from PyPI
+
+Use a global tool install if you want the `yotta` command available everywhere:
+
+```bash
+uv tool install yotta-framework
+yotta --version
+```
+
+### Add yotta to a project
+
+If you want to use yotta inside an existing project managed by `uv`:
+
+```bash
+uv add yotta-framework
+```
+
+### Development setup
+
+If you want to work on yotta itself:
+
 ```bash
 git clone https://github.com/dim-gggl/yotta.git
 cd yotta
-uv sync
+uv sync --all-extras
 uv pip install -e .
 ```
 ## Quick Start
@@ -53,51 +73,54 @@ yotta scaffolds the entire folder structure for you.
 ```bash
 yotta startproject my_cli
 cd my_cli
+uv sync
 # A pyproject.toml and .env.example (with YOTTA_SETTINGS_MODULE) are created for you
 ```
 2. Create an app (module)
 ```bash
-uv run python manage.py startapp inventory
+uv run ./manage.py startapp inventory
 ```
 > Note: Don't forget to add 'my_cli.inventory' (replace with your project name) to INSTALLED_APPS in your settings.py file.
 3. Scaffold a command interactively (optional)
 ```bash
-uv run python manage.py startcommand
+uv run ./manage.py startcommand
 ```
 Follow the prompts to pick the target app, command name, arguments, and options. yotta will append a ready-to-edit function to the selected app's `commands.py`.
 4. Write your first command
-In src/inventory/commands.py:
+In `my_cli/inventory/commands.py`:
 ```python
+import time
+
 from yotta.cli.decorators import command, argument
 from yotta.core.context import YottaContext
 from yotta.core.types import EMAIL
 
+
 @command(name="add_user", help="Adds a user to the inventory")
 @argument("email", type=EMAIL)
-def add_user(yotta: YottaContext, email: str):
+def add_user(yotta: YottaContext, email: str) -> None:
     # Using the native UI engine
     yotta.ui.header("New User")
     # Access project configuration without extra imports
     # (settings are loaded lazily on first attribute access)
     _ = yotta.settings
-    
+
     with yotta.ui.spinner("Checking database..."):
         # Simulate work
-        import time; time.sleep(1)
-        
+        time.sleep(1)
+
     yotta.ui.success(f"User [bold]{email}[/] added successfully!")
-    
+
     # Automatic formatted table
     yotta.ui.table(
         columns=["ID", "Email", "Status"],
         rows=[["1", email, "Active"]],
-        title="Summary"
+        title="Summary",
     )
-
 ```
 5. Run the command
 ```bash
-uv run python manage.py add_user contact@example.com
+uv run ./manage.py add_user contact@example.com
 ```
 
 ### Settings and environment
@@ -120,20 +143,26 @@ THEME = "dark"
 ## TUI Mode (Textual Integration)
 Need a real-time interactive dashboard? yotta integrates Textual natively.
 
-Define a view in src/inventory/ui.py:
+Define a view in `my_cli/inventory/ui.py`:
 ```python
-from yotta.ui.tui import yottaApp
+from textual.app import ComposeResult
 from textual.widgets import Placeholder
+from yotta.ui.tui import YottaApp
 
-class MonitorDashboard(yottaApp):
-    def compose(self):
+
+class MonitorDashboard(YottaApp):
+    def compose(self) -> ComposeResult:
         yield Placeholder("Performance charts here")
 
 ```
 Launch it from a standard command:
 ```python
+from yotta.cli.decorators import command
+from yotta.core.context import YottaContext
+
+
 @command(name="monitor")
-def launch_monitor(ctx: Context):
+def launch_monitor(yotta: YottaContext) -> None:
     app = MonitorDashboard(title="Super Monitor")
     app.run()
 
@@ -218,13 +247,16 @@ Validate user input without writing a single if/else.
 ## Project Structure
 ```
 my_cli/
-├── manage.py            # Entry point (Django-like)
-├── settings.py          # Global configuration
-└── my_cli/              # Your applications folder (as a package)
+├── .env.example           # Environment bootstrap
+├── manage.py              # Project entry point
+├── pyproject.toml         # Project metadata and dependencies
+├── settings.py            # Global configuration
+└── my_cli/                # Your applications folder (as a package)
     ├── main/
-    │   ├── commands.py  # Your CLI commands
-    │   └── ui.py        # Your visual components
+    │   ├── __init__.py
+    │   └── commands.py    # Example command created by startproject
     └── inventory/
-        ├── commands.py
-        └── ...
+        ├── __init__.py
+        ├── commands.py    # Your CLI commands
+        └── ui.py          # Your visual components
 ```

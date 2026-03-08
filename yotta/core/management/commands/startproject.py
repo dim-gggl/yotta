@@ -14,6 +14,7 @@ from yotta.ui.spinner import centered_spinner
 
 console = Console()
 YOTTA_REPOSITORY_URL = "https://github.com/dim-gggl/yotta.git"
+YOTTA_DISTRIBUTION_NAME = "yotta-framework"
 
 
 @click.command(name="startproject", help="Scaffold a new yotta project.")
@@ -136,10 +137,10 @@ version = "0.1.0"
 description = "A yotta project."
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = ["yotta"]
+dependencies = ["{YOTTA_DISTRIBUTION_NAME}"]
 
 [tool.uv.sources]
-yotta = {{ git = "{YOTTA_REPOSITORY_URL}" }}
+{YOTTA_DISTRIBUTION_NAME} = {{ git = "{YOTTA_REPOSITORY_URL}" }}
 """
 
     def get_env_example(self, settings_module: str) -> str:
